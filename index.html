@@ -110,6 +110,7 @@ nav button.on{color:var(--red)}
 <nav><div>
   <button data-tab="lecons"><span class="zh">課</span>Lessons</button>
   <button data-tab="erreurs"><span class="zh">錯</span>My mistakes<i class="badge hide" id="badge"></i></button>
+  <button data-tab="veronica"><span class="zh">詞</span>Veronica</button>
   <button data-tab="bilans"><span class="zh">考</span>Tests</button>
 </div></nav>
 <div id="quiz" class="quiz hide"></div>
@@ -440,8 +441,38 @@ for(const L of LESSONS){
   for(const s of L.sentences){const tk=s[0].split(" ");add({zh:tk.map(t=>PUNCT[t]||t).join(""),py:s[1],en:s[2],kind:"sent",tk})}
   BYL[L.id]=list;
 }
-const ALL=Object.values(ITEMS);
-const lesson=id=>LESSONS.find(l=>l.id===id);
+let ALL=Object.values(ITEMS);
+const VL={id:"v",code:"V",title:"Veronica's vocabulary",sub:"Words and expressions added by Veronica"};
+const lesson=id=>id==="v"?VL:LESSONS.find(l=>l.id===id);
+BYL.v=[];
+/* ---------- Veronica's vocabulary (shared list) ---------- */
+const VKEY="xuezhongwen-veronica";
+let V={mode:"local",items:[],ready:false,msg:"",code:""},vdb=null;
+try{V.code=localStorage.getItem(VKEY+"-code")||""}catch(e){}
+function setV(list){
+  for(const k of Object.keys(ITEMS))if(k.startsWith("v:"))delete ITEMS[k];
+  V.items=(Array.isArray(list)?list:[]).filter(x=>x&&x.zh&&x.en);
+  BYL.v=V.items.map(x=>{const o={zh:String(x.zh),py:String(x.py||""),en:String(x.en),kind:[...String(x.zh)].length===1?"char":"word",vid:x.id,id:"v:"+x.zh,L:"v"};ITEMS[o.id]=o;return o});
+  ALL=Object.values(ITEMS);V.ready=true;
+}
+async function vLoad(){
+  try{if(/^https?:/.test(location.protocol)){const r=await fetch("api/veronica",{cache:"no-store"});
+    if(r.ok&&(r.headers.get("content-type")||"").includes("json")){V.mode="api";setV(await r.json());render();return}}}catch(e){}
+  if(V.mode!=="db"){try{setV(JSON.parse(localStorage.getItem(VKEY)||"[]"))}catch(e){setV([])}render()}
+}
+async function vApi(method,path,body){
+  const r=await fetch("api/veronica"+path,{method,headers:{"Content-Type":"application/json","X-Edit-Code":V.code||""},body:body?JSON.stringify(body):undefined});
+  if(r.status===401)throw new Error("code");if(!r.ok)throw new Error("server");return r.json()}
+async function vWrite(next){
+  if(V.mode==="api")return;
+  if(V.mode==="db"&&vdb){await vdb.set({items:next});setV(next);return}
+  try{localStorage.setItem(VKEY,JSON.stringify(next))}catch(e){}setV(next)}
+async function vAdd(zh,py,en){
+  if(V.mode==="api"){setV(await vApi("POST","",{zh,py,en}));return}
+  const next=V.items.filter(x=>x.zh!==zh).concat([{id:Date.now().toString(36),zh,py,en,d:Date.now()}]);await vWrite(next)}
+async function vDel(id){
+  if(V.mode==="api"){setV(await vApi("DELETE","/"+encodeURIComponent(id)));return}
+  await vWrite(V.items.filter(x=>x.id!==id))}
 
 /* ---------- state and saving ---------- */
 const KEY="xuezhongwen-tc-v1";
@@ -456,6 +487,7 @@ async function initSync(){
     if(!window.claude||!window.claude.use)return;
     const user=await window.claude.use("user");const db=await window.claude.use("db");
     if(!user||!db)return;const id=await user.id();if(!id)return;
+    if(V.mode!=="api"){try{vdb=db.doc("shared/veronica");V.mode="db";vdb.onSnapshot(s=>{setV(s.exists?(s.data()||{}).items:[]);if(!Q)render()},()=>{})}catch(e){vdb=null}}
     ref=db.doc("data/users/"+id+"/progress");
     const snap=await ref.get();
     if(snap.exists){const d=snap.data()||{};
@@ -476,7 +508,7 @@ const spkBtn=t=>canSpeak?`<button class="spk" data-say="${esc(t)}" aria-label="L
 
 /* ---------- progress ---------- */
 const errCount=()=>Object.keys(S.err).filter(k=>ITEMS[k]).length;
-function progress(lid){const l=BYL[lid];const k=l.filter(i=>S.known[i.id]&&!S.err[i.id]).length;return Math.round(100*k/l.length)}
+function progress(lid){const l=BYL[lid]||[];if(!l.length)return 0;const k=l.filter(i=>S.known[i.id]&&!S.err[i.id]).length;return Math.round(100*k/l.length)}
 function record(it,ok){
   if(ok){S.known[it.id]=1;const e=S.err[it.id];if(e){e.s=(e.s||0)+1;if(e.s>=2)delete S.err[it.id]}}
   else{const e=S.err[it.id]||{n:0,s:0};e.n++;e.s=0;e.d=Date.now();S.err[it.id]=e}
@@ -486,7 +518,7 @@ function record(it,ok){
 let view="lecons",cur=null,sub="vocab",filt="all",query="";
 function route(){const h=location.hash.slice(1);
   if(h.startsWith("lecon-")&&lesson(h.slice(6))){view="lecon";cur=h.slice(6)}
-  else if(h==="erreurs"||h==="bilans")view=h;else view="lecons";
+  else if(h==="erreurs"||h==="bilans"||h==="veronica")view=h;else view="lecons";
   render();window.scrollTo(0,0)}
 function go(h){if(location.hash==="#"+h)route();else location.hash=h}
 
@@ -499,6 +531,7 @@ function render(){
   if(view==="lecons")h+=vLessons();
   else if(view==="lecon")h+=vLesson();
   else if(view==="erreurs")h+=vErrors();
+  else if(view==="veronica")h+=vVeronica();
   else h+=vTests();
   a.innerHTML=h;
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===(view==="lecon"?"lecons":view)));
@@ -510,6 +543,9 @@ function vLessons(){
   LESSONS.map(L=>{const p=progress(L.id);return `<button class="lcard" data-go="lecon-${L.id}"><span class="seal">${L.code}</span>
    <div style="flex:1"><b>Lesson ${L.code} · ${esc(L.title)}</b><span>${esc(L.sub)} · ${BYL[L.id].length} items</span>
    <div class="bar"><i style="width:${p}%"></i></div></div><span class="cnt" style="background:none;color:var(--mute)">${p}%</span></button>`}).join("")+
+  `<button class="lcard" data-go="veronica"><span class="seal" style="background:var(--ink);color:var(--bg)">V</span>
+   <div style="flex:1"><b>${esc(VL.title)}</b><span>${esc(VL.sub)} · ${BYL.v.length} item${BYL.v.length===1?"":"s"}</span>
+   <div class="bar"><i style="width:${progress("v")}%"></i></div></div><span class="cnt" style="background:none;color:var(--mute)">${progress("v")}%</span></button>`+
   `<p class="sync">${syncState==="cloud"?"Progress saved to your account":"Progress saved on this device"}</p>`;
 }
 
@@ -557,7 +593,7 @@ function vErrors(){
   let h=`<h1>My mistakes</h1><p class="sub">Everything you get wrong lands here. An item disappears after 2 correct answers in a row.</p>`;
   if(!ids.length)return h+`<div class="empty"><span class="zh">好</span>No mistakes to review yet. Do an exercise or a test!</div>`;
   h+=`<button class="primary" data-start="errors">Review my mistakes (${ids.length})</button><h2>To review</h2>`;
-  h+=ids.map(k=>{const i=ITEMS[k];return `<div class="row"><div class="w"><div class="z">${i.zh}</div><div class="p">${esc(i.py)}</div><div class="e">${esc(i.en)} · Lesson ${lesson(i.L).code}</div></div><span class="cnt">×${S.err[k].n}</span>${spkBtn(i.zh)}<button class="x" data-rm="${esc(k)}" aria-label="Remove">×</button></div>`}).join("");
+  h+=ids.map(k=>{const i=ITEMS[k];return `<div class="row"><div class="w"><div class="z">${esc(i.zh)}</div><div class="p">${esc(i.py)}</div><div class="e">${esc(i.en)} · ${i.L==="v"?"Veronica":"Lesson "+lesson(i.L).code}</div></div><span class="cnt">×${S.err[k].n}</span>${spkBtn(i.zh)}<button class="x" data-rm="${esc(k)}" aria-label="Remove">×</button></div>`}).join("");
   h+=`<button class="ghost" id="reset">Reset all my progress</button><div id="resetC" class="hide gcard"><p>Erase all mistakes, progress and test results?</p><button class="primary" id="resetY">Yes, erase everything</button><button class="ghost" id="resetN">Cancel</button></div>`;
   return h;
 }
@@ -567,8 +603,43 @@ function vTests(){
     <div class="stat"><div><b>${best===null?"—":best+"%"}</b><span>best score</span></div><div><b>${t.length}</b><span>test${t.length===1?"":"s"} taken</span></div></div>
     <button class="primary" data-exam="${id}">Start</button></div>`};
   let h=`<h1>Tests</h1><p class="sub">20 questions, no pinyin and no instant feedback. Your score and the corrections appear at the end, and your mistakes go to “My mistakes”.</p>`;
-  h+=LESSONS.map(L=>card(L.id,`Lesson ${L.code} · ${L.title}`,L.sub)).join("")+card("all","Full test","All lessons mixed");
-  if(S.tests.length){h+=`<h2>History</h2>`+S.tests.slice().reverse().slice(0,15).map(t=>`<div class="row"><div class="w"><b>${t.l==="all"?"Full test":"Lesson "+lesson(t.l).code}</b><div class="e">${new Date(t.d).toLocaleDateString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div></div><span class="cnt" style="${t.s/t.n>=.8?"background:var(--okbg);color:var(--ok)":""}">${t.s}/${t.n}</span></div>`).join("")}
+  h+=LESSONS.map(L=>card(L.id,`Lesson ${L.code} · ${L.title}`,L.sub)).join("")+card("all","Full test","All lessons mixed")+(BYL.v.length>=4?card("v",VL.title,"Only Veronica's words"):"");
+  if(S.tests.length){h+=`<h2>History</h2>`+S.tests.slice().reverse().slice(0,15).map(t=>`<div class="row"><div class="w"><b>${t.l==="all"?"Full test":t.l==="v"?VL.title:"Lesson "+(lesson(t.l)||{code:"?"}).code}</b><div class="e">${new Date(t.d).toLocaleDateString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div></div><span class="cnt" style="${t.s/t.n>=.8?"background:var(--okbg);color:var(--ok)":""}">${t.s}/${t.n}</span></div>`).join("")}
+  return h;
+}
+
+
+let VD={vzh:"",vpy:"",ven:""};
+const norm2=s=>String(s).trim().replace(/\s+/g," ");
+function numPy(s){return s.replace(/([a-zA-ZüÜ:]+)([1-5])/g,(m,syl,t)=>{syl=syl.replace(/u:|v/g,"ü").replace(/U:|V/g,"Ü");if(t==="5")return syl;const n=+t-1,low=syl.toLowerCase();
+  let i=low.search(/[ae]/);if(i<0)i=low.indexOf("ou");if(i<0)for(let k=low.length-1;k>=0;k--)if("aeiouü".includes(low[k])){i=k;break}
+  if(i<0)return syl;const c=syl[i],mk=TONES[c.toLowerCase()][n];return syl.slice(0,i)+(c===c.toLowerCase()?mk:mk.toUpperCase())+syl.slice(i+1)})}
+function vVeronica(){
+  const n=BYL.v.length;
+  let h=`<h1>${esc(VL.title)}</h1><p class="sub">Veronica adds a word or expression in Chinese with its English translation, and it joins this list. ${V.mode==="local"?"":"The list is shared: everyone using the site sees the same words."}</p>
+  <form id="vform" class="gcard" autocomplete="off">
+   <label class="note" for="vzh">Chinese (word or expression)</label>
+   <input class="search" id="vzh" lang="zh-Hant-TW" placeholder="例如：好吃" value="${esc(VD.vzh)}" style="font-size:22px;margin:4px 0 12px">
+   <label class="note" for="vpy">Pinyin (optional — “hao3 chi1” works too)</label>
+   <input class="search" id="vpy" placeholder="hǎochī" value="${esc(VD.vpy)}" autocapitalize="off" spellcheck="false" style="margin:4px 0 12px">
+   <label class="note" for="ven">English translation</label>
+   <input class="search" id="ven" lang="en" placeholder="delicious" value="${esc(VD.ven)}" style="margin:4px 0 14px">
+   <button class="primary" id="vadd" type="submit">Add to the list</button>
+   ${V.msg?`<p class="note" role="status" style="margin:10px 0 0">${esc(V.msg)}</p>`:""}
+  </form>`;
+  if(!V.ready)h+=`<p class="note">Loading the list…</p>`;
+  else if(!n)h+=`<div class="empty"><span class="zh">詞</span>No words yet. The first one Veronica adds will appear here.</div>`;
+  else{
+    h+=`<div class="tiles" style="margin:14px 0">
+     <button class="tbtn" data-start="zh2en" data-l="v"><b class="zh">中 → EN</b><span>Recognize</span></button>
+     <button class="tbtn" data-start="en2zh" data-l="v"><b class="zh">EN → 中</b><span>Produce</span></button>
+     <button class="tbtn" data-start="write" data-l="v"><b class="zh">EN → 寫</b><span>Write with your keyboard</span></button>
+     <button class="tbtn" data-start="mix" data-l="v"><b>Mix</b><span>All exercise types</span></button></div>`;
+    h+=`<h2>The list (${n})</h2>`+BYL.v.slice().reverse().map(i=>`<div class="row"><div class="w"><div class="z">${esc(i.zh)}</div>${i.py?`<div class="p">${esc(i.py)}</div>`:""}<div class="e">${esc(i.en)}</div></div>${S.err[i.id]?'<span class="cnt">to review</span>':""}${spkBtn(i.zh)}<button class="x" data-vdel="${esc(i.vid)}" aria-label="Delete">×</button></div>`).join("");
+  }
+  if(V.mode==="api")h+=`<details class="gcard"><summary class="note">Edit code (only if the site asks for one)</summary>
+   <input class="search" id="vcode" type="password" value="${esc(V.code)}" placeholder="Code" style="margin:10px 0">
+   <button class="ghost" id="vcodeS" type="button">Save code on this device</button></details>`;
   return h;
 }
 
@@ -618,7 +689,7 @@ function start(kind,lid){
   const exam=kind==="exam";const qs=buildSession(kind,lid,exam?20:kind==="errors"?Math.min(15,errCount()):10);
   if(!qs.length)return;
   const L=lid&&lid!=="all"?lesson(lid):null;
-  Q={kind,lid,exam,qs,i:0,res:[],requeued:new Set(),title:exam?(L?`Test · Lesson ${L.code}`:"Full test"):kind==="errors"?"Mistake review":(L?`Lesson ${L.code}`:"")};
+  Q={kind,lid,exam,qs,i:0,res:[],requeued:new Set(),title:exam?(L?(L.id==="v"?"Test · Veronica":`Test · Lesson ${L.code}`):"Full test"):kind==="errors"?"Mistake review":(L?(L.id==="v"?"Veronica":`Lesson ${L.code}`):"")};
   $("#quiz").classList.remove("hide");document.body.style.overflow="hidden";drawQ()}
 function closeQ(){Q=null;$("#quiz").classList.add("hide");$("#quiz").innerHTML="";document.body.style.overflow="";render()}
 function drawQ(fb){
@@ -628,8 +699,8 @@ function drawQ(fb){
   <div class="qtype">${esc(Q.title)} · ${MODES[q.mode]}</div>`;
   const big=[...it.zh].length<=2?"big":"mid";
   const pc=fb?"prompt still":"prompt";
-  if(q.mode==="zh2en")h+=`<div class="${pc}"><div class="${big}">${it.zh}</div>${showPy?`<div class="p">${esc(it.py)}</div>`:""}<div style="display:flex;justify-content:center;margin-top:8px">${spkBtn(it.zh)}</div></div>`;
-  else if(q.mode==="tone")h+=`<div class="${pc}"><div class="${big}">${it.zh}</div><div class="note">${esc(it.en)}</div></div>`;
+  if(q.mode==="zh2en")h+=`<div class="${pc}"><div class="${big}">${esc(it.zh)}</div>${showPy?`<div class="p">${esc(it.py)}</div>`:""}<div style="display:flex;justify-content:center;margin-top:8px">${spkBtn(it.zh)}</div></div>`;
+  else if(q.mode==="tone")h+=`<div class="${pc}"><div class="${big}">${esc(it.zh)}</div><div class="note">${esc(it.en)}</div></div>`;
   else h+=`<div class="${pc}"><div class="en">${esc(it.en)}</div></div>`;
   if(q.mode==="write"){
     if(showPy)h=h.replace('<div class="en">'+esc(it.en)+'</div></div>','<div class="en">'+esc(it.en)+'</div><div class="p">'+esc(it.py)+'</div></div>');
@@ -649,7 +720,7 @@ function drawQ(fb){
   }
   if(fb){const ok=fb==="good";
     h+=`<div class="fb ${fb}"><h4>${ok?"對！ Correct":"Not quite…"}</h4>
-    <div class="ans"><div style="flex:1"><div class="z">${it.zh}</div><div style="color:var(--red)">${esc(it.py)}</div><div>${esc(it.en)}</div></div>${spkBtn(it.zh)}</div>
+    <div class="ans"><div style="flex:1"><div class="z">${esc(it.zh)}</div><div style="color:var(--red)">${esc(it.py)}</div><div>${esc(it.en)}</div></div>${spkBtn(it.zh)}</div>
     <button class="primary" id="next">Continue</button></div>`}
   h+=`</div>`;$("#quiz").innerHTML=h;
   if(fb){speak(it.zh);const n=$("#next");n&&n.focus()}
@@ -670,7 +741,7 @@ function finish(){
   let h=`<div class="qin"><div class="qtop"><button class="x" data-quit aria-label="Close">×</button><div class="bar"><i style="width:100%"></i></div></div>
   <div class="score"><div class="zh">${seal}</div><b>${s} / ${n}</b><span class="note">${pct}% correct${seal==="加油"?" · 加油 jiāyóu = keep going!":""}</span></div>`;
   if(wrong.length){h+=`<h2>${Q.exam?"Corrections":"To review"} (${wrong.length})</h2>`+wrong.map(r=>{const it=r.q.it;
-    return `<div class="row"><div class="w"><div class="z">${it.zh}</div><div class="p">${esc(it.py)}</div><div class="e">${esc(it.en)}</div>${r.given?`<div class="note" style="color:var(--red)">Your answer: ${esc(r.given)}</div>`:""}</div>${spkBtn(it.zh)}</div>`}).join("")+
+    return `<div class="row"><div class="w"><div class="z">${esc(it.zh)}</div><div class="p">${esc(it.py)}</div><div class="e">${esc(it.en)}</div>${r.given?`<div class="note" style="color:var(--red)">Your answer: ${esc(r.given)}</div>`:""}</div>${spkBtn(it.zh)}</div>`}).join("")+
     `<p class="note">These items were added to “My mistakes”.</p>`}
   else h+=`<p class="empty">Perfect score, well done!</p>`;
   h+=`<button class="primary" id="again">Try again</button><button class="ghost" data-quit>Finish</button></div>`;
@@ -690,6 +761,8 @@ document.addEventListener("click",e=>{
   if(t.id==="pyT"){S.pinyin=!S.pinyin;save();render();return}
   if(t.dataset.start){start(t.dataset.start,t.dataset.l);return}
   if(t.dataset.exam){start("exam",t.dataset.exam==="all"?null:t.dataset.exam);return}
+  if(t.dataset.vdel){const id=t.dataset.vdel;vDel(id).then(()=>{V.msg="Deleted.";render()}).catch(err=>{V.msg=err.message==="code"?"Wrong or missing edit code.":"Couldn't delete.";render()});return}
+  if(t.id==="vcodeS"){V.code=$("#vcode").value.trim();try{localStorage.setItem(VKEY+"-code",V.code)}catch(_){}V.msg="Edit code saved on this device.";render();return}
   if(t.dataset.rm){delete S.err[t.dataset.rm];save();render();return}
   if(t.id==="reset"){$("#resetC").classList.remove("hide");return}
   if(t.id==="resetN"){$("#resetC").classList.add("hide");return}
@@ -705,10 +778,19 @@ document.addEventListener("click",e=>{
   if(t.id==="checkw"||t.id==="skipw"){const g=t.id==="skipw"?"":($("#wr").value||"");q.given=g;answer(t.id==="checkw"&&norm(g)===norm(q.ans)&&norm(g)!=="",g||"—");return}
   if(t.id==="check"){const g=q.picked.map(k=>q.pool[k].w).join(" ");answer(g===q.ans,g.replace(/ /g,""));return}
 });
+document.addEventListener("submit",async e=>{if(e.target.id!=="vform")return;e.preventDefault();
+  const zh=norm2($("#vzh").value),en=$("#ven").value.trim(),py=numPy($("#vpy").value.trim());
+  if(!zh||!en){V.msg="Please fill in the Chinese and the English.";render();return}
+  if(zh.length>60||en.length>200||py.length>120){V.msg="That's a bit long — keep it under 60 characters.";render();return}
+  const b=$("#vadd");b.disabled=true;
+  try{await vAdd(zh,py,en);VD={vzh:"",vpy:"",ven:""};V.msg=`Added: ${zh} = ${en}`}
+  catch(err){V.msg=err.message==="code"?"Wrong or missing edit code — enter it below.":"Couldn't save. Check your connection and try again."}
+  render();const f=$("#vzh");f&&f.focus()});
 $("#sheet").addEventListener("click",e=>{if(e.target.id==="sheet")$("#sheet").classList.add("hide")});
-document.addEventListener("input",e=>{if(e.target.id==="q"){query=e.target.value.trim();const pos=e.target.selectionStart;render();const q=$("#q");if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(_){}}}});
+document.addEventListener("input",e=>{if(e.target.id in VD){VD[e.target.id]=e.target.value;return}if(e.target.id==="q"){query=e.target.value.trim();const pos=e.target.selectionStart;render();const q=$("#q");if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(_){}}}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="wr"){e.preventDefault();const b=$("#checkw");b&&b.click();return}if(e.key==="Escape"){if(!$("#sheet").classList.contains("hide"))$("#sheet").classList.add("hide");else if(Q)closeQ()}});
 window.addEventListener("hashchange",route);
+vLoad();
 route();
 initSync();
 }
