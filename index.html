@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>學中文 · Traditional Chinese</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=LXGW+WenKai+TC&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calm, studious, encouraging — a pocket exercise book.
+   IDEA: the gridded character workbook (田字格) and the teacher's vermilion correction seal.
+   PICTURE: the character itself, large, in its grid; the exercises are the picture.
+   COLOUR and TYPE: white paper, near-black ink, seal vermilion; WenKai TC for characters, Inter + Noto Sans TC for the rest.
+   LAYOUT: one phone column (max 560px), bottom tab bar, 44px targets. */
+:root{color-scheme:light dark;
+  --bg:light-dark(#ffffff,#121214);--card:light-dark(#f6f5f3,#1c1c1f);--line:light-dark(#e6e3df,#2c2c30);
+  --ink:light-dark(#17181c,#f2efe9);--mute:light-dark(#6b6966,#a29f9a);
+  --red:light-dark(#d8352a,#ff6b5c);--redbg:light-dark(#fdece9,#3a1d1a);
+  --ok:light-dark(#1d7f4e,#5fd59a);--okbg:light-dark(#e5f5ec,#16301f);
+  --zh:"LXGW WenKai TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",serif}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:16px/1.5 Inter,"Noto Sans TC",system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+.app{max-width:560px;margin:0 auto;min-height:100vh;padding:0 16px 96px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.logo{font:32px/1 var(--zh);color:var(--red)}
+.htitle{flex:1;font-weight:700;line-height:1.2}.htitle small{display:block;font-weight:400;color:var(--mute);font-size:13px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 12px;min-height:40px;font-size:14px}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+h1{font-size:28px;line-height:1.1;margin:20px 0 6px;text-wrap:balance}
+h2{font-size:19px;margin:26px 0 10px}
+.sub{color:var(--mute);margin:0 0 14px}
+.zh{font-family:var(--zh)}
+.lcard{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0}
+.seal{flex:none;width:58px;height:58px;border-radius:12px;background:var(--red);color:#fff;display:grid;place-items:center;font:30px/1 var(--zh)}
+.lcard b{display:block;font-size:17px}.lcard span{color:var(--mute);font-size:14px}.lcard .seal{color:#fff;font-size:30px}
+.bar{height:6px;border-radius:9px;background:var(--line);margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--red);border-radius:9px}
+.seg{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;margin:12px 0;position:sticky;top:69px;z-index:4}
+.seg button{flex:1;border:0;background:none;border-radius:9px;padding:9px 4px;min-height:40px;font-size:14px;font-weight:600;color:var(--mute)}
+.seg button.on{background:var(--bg);color:var(--ink);box-shadow:0 1px 3px #0002}
+.back{border:0;background:none;color:var(--red);font-weight:600;padding:10px 0;min-height:44px}
+.search{width:100%;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:10px}
+.cc{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:10px 6px;text-align:center}
+.tz{position:relative;width:62px;height:62px;margin:0 auto 6px;font:44px/62px var(--zh);border:1px solid var(--redbg);background:
+ linear-gradient(var(--redbg),var(--redbg)) center/1px 100% no-repeat,linear-gradient(var(--redbg),var(--redbg)) center/100% 1px no-repeat}
+.cc .p{color:var(--red);font-size:14px}.cc .e{font-size:12px;color:var(--mute);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.row .w{flex:1}.row .z{font:21px/1.35 var(--zh)}.row .p{color:var(--red);font-size:14px}.row .e{color:var(--mute);font-size:14px}
+.spk{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--card);display:grid;place-items:center}
+.spk svg{width:18px;height:18px}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.gcard h3{margin:0 0 6px;font-size:17px}.gcard p{margin:0 0 8px}
+.ex{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px dashed var(--line)}
+.ex .z{font:20px/1.3 var(--zh)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tbtn{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:16px;text-align:left;min-height:96px}
+.tbtn b{display:block;font-size:20px}.tbtn span{color:var(--mute);font-size:13px}
+.tbtn.wide{grid-column:1/-1;background:var(--ink);color:var(--bg)}.tbtn.wide span{color:inherit;opacity:.75}
+.primary{display:block;width:100%;border:0;background:var(--red);color:#fff;border-radius:14px;padding:15px;font-weight:700;font-size:17px;min-height:52px}
+.ghost{display:block;width:100%;border:1px solid var(--line);background:none;border-radius:14px;padding:13px;font-weight:600;min-height:48px;margin-top:10px}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--bg);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+nav div{display:flex;width:100%;max-width:560px}
+nav button{flex:1;border:0;background:none;padding:8px 0 10px;min-height:58px;font-size:12px;color:var(--mute);position:relative}
+nav button .zh{display:block;font-size:22px;line-height:1.2}
+nav button.on{color:var(--red)}
+.badge{position:absolute;top:4px;left:calc(50% + 10px);background:var(--red);color:#fff;border-radius:9px;font-size:11px;padding:0 6px;line-height:18px}
+.empty{text-align:center;color:var(--mute);padding:40px 10px}.empty .zh{font-size:56px;color:var(--ok);display:block}
+.stat{display:flex;gap:10px;margin:12px 0}.stat div{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.stat b{display:block;font-size:24px}.stat span{font-size:13px;color:var(--mute)}
+.x{flex:none;border:0;background:none;color:var(--mute);width:40px;height:40px;font-size:20px}
+.cnt{flex:none;font-size:12px;background:var(--redbg);color:var(--red);border-radius:9px;padding:2px 8px;font-weight:700}
+/* quiz */
+.quiz{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto}
+.qin{max-width:560px;margin:0 auto;padding:12px 16px 40px;min-height:100%;display:flex;flex-direction:column}
+.qtop{display:flex;align-items:center;gap:12px}.qtop .bar{flex:1;margin:0;height:8px}
+.qtype{color:var(--mute);font-size:13px;margin:18px 0 4px;font-weight:600}
+.prompt{text-align:center;padding:18px 0 22px}
+.prompt .big{font:clamp(52px,16vw,84px)/1.15 var(--zh)}.prompt .mid{font:clamp(28px,8vw,38px)/1.3 var(--zh)}
+.prompt .en{font-size:24px;font-weight:700;line-height:1.3}.prompt .p{color:var(--red);font-size:18px;margin-top:4px}
+.opts{display:grid;gap:10px}
+.opt{border:2px solid var(--line);background:var(--bg);border-radius:14px;padding:14px;min-height:56px;text-align:left;font-size:17px}
+.opt.zhopt{font:24px/1.3 var(--zh);text-align:center}.opt small{display:block;font:14px Inter,sans-serif;color:var(--red)}
+.opt.sel{border-color:var(--ink)}.opt.good{border-color:var(--ok);background:var(--okbg)}.opt.bad{border-color:var(--red);background:var(--redbg)}
+.slots{min-height:64px;border-bottom:2px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;padding:8px 0;align-items:center}
+.pool{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.tile{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 12px;font:22px/1.2 var(--zh);min-height:46px}
+.tile.used{visibility:hidden}
+.fb{position:sticky;bottom:0;margin:20px -16px -40px;padding:16px 16px 24px;border-top:2px solid}
+.fb.good{background:var(--okbg);border-color:var(--ok)}.fb.bad{background:var(--redbg);border-color:var(--red)}
+.fb h4{margin:0 0 6px;font-size:18px}.fb.good h4{color:var(--ok)}.fb.bad h4{color:var(--red)}
+.fb .ans{display:flex;gap:10px;align-items:center;margin-bottom:12px}.fb .z{font:24px/1.3 var(--zh)}
+.score{text-align:center;padding:24px 0}.score .zh{font-size:64px;color:var(--red);line-height:1}.score b{display:block;font-size:44px}
+.sheet{position:fixed;inset:0;z-index:15;background:#0007;display:flex;align-items:flex-end;justify-content:center}
+.sheet>div{background:var(--bg);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:18px 16px 28px;max-height:86vh;overflow-y:auto}
+.sheet .tz{width:120px;height:120px;font-size:88px;line-height:120px}
+.hide{display:none!important}
+.dlg{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.dlg .who{flex:none;width:28px;height:28px;border-radius:50%;background:var(--redbg);color:var(--red);display:grid;place-items:center;font-weight:700;font-size:13px}
+.note{font-size:13px;color:var(--mute)}
+.sync{font-size:12px;color:var(--mute);text-align:center;margin-top:24px}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.prompt:not(.still){animation:pop .25s ease-out}@keyframes pop{from{opacity:0;transform:translateY(8px)}}}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<nav><div>
+  <button data-tab="lecons"><span class="zh">課</span>Lessons</button>
+  <button data-tab="erreurs"><span class="zh">錯</span>My mistakes<i class="badge hide" id="badge"></i></button>
+  <button data-tab="bilans"><span class="zh">考</span>Tests</button>
+</div></nav>
+<div id="quiz" class="quiz hide"></div>
+<div id="sheet" class="sheet hide"></div>
+<script>
+// Lesson content — Traditional Chinese, pinyin, English
+// Character: [char, pinyin, english, [[word, pinyin, english], ...]]
+// Word: [word, pinyin, english]
+// Sentence: ["words separated by spaces", pinyin, english]
+const LESSONS = [
+{
+  id: "a", code: "A", title: "Introduction (1)",
+  sub: "Numbers, people and first characters",
+  chars: [
+    ["一","yī","one",[["十一","shíyī","eleven"],["一個人","yí ge rén","one person"]]],
+    ["二","èr","two",[["十二","shí'èr","twelve"],["二十","èrshí","twenty"]]],
+    ["三","sān","three",[["十三","shísān","thirteen"],["三十","sānshí","thirty"]]],
+    ["六","liù","six",[["十六","shíliù","sixteen"],["六十","liùshí","sixty"],["六十二","liùshí'èr","sixty-two"]]],
+    ["八","bā","eight",[["十八","shíbā","eighteen"],["八十","bāshí","eighty"]]],
+    ["十","shí","ten",[["八十一","bāshíyī","eighty-one"]]],
+    ["工","gōng","work; worker, craftsman",[["工人","gōngrén","worker"],["工夫","gōngfu","(free) time"],["木工","mùgōng","carpenter"]]],
+    ["王","wáng","king; Wang (surname)",[["王太太","Wáng tàitai","Mrs. Wang"]]],
+    ["上","shàng","above, on; to go up",[["天上","tiān shàng","in the sky"],["上午","shàngwǔ","morning"]]],
+    ["下","xià","below, under; to go down",[["下午","xiàwǔ","afternoon"],["天下","tiānxià","the world"]]],
+    ["人","rén","person",[["大人","dàrén","adult"],["生人","shēngrén","stranger"],["三個人","sān ge rén","three people"]]],
+    ["個","gè","(general measure word)",[]],
+    ["木","mù","wood",[]],
+    ["不","bù","not; no",[["不大","bú dà","not big"],["不少","bù shǎo","quite a lot (of)"],["不太大","bú tài dà","not very big"]]],
+    ["大","dà","big",[["大火","dà huǒ","big fire"],["太大","tài dà","too big"]]],
+    ["太","tài","too (excessively)",[["太太","tàitai","wife; Mrs."],["太少","tài shǎo","too few"]]],
+    ["天","tiān","sky; day",[["天天","tiāntiān","every day"],["一天","yì tiān","one day"],["半天","bàntiān","half a day; a long while"],["一天半","yì tiān bàn","a day and a half"]]],
+    ["夫","fū","man; husband",[["夫人","fūrén","wife (formal); Madame"],["大夫","dàifu","doctor"]]],
+    ["午","wǔ","noon",[]],
+    ["牛","niú","cattle, ox; Niu (surname)",[["大牛","dà niú","big ox"],["牛羊","niú yáng","cattle and sheep"]]],
+    ["羊","yáng","sheep",[]],
+    ["半","bàn","half",[["一半","yíbàn","half"],["半個","bàn ge","half (of one)"]]],
+    ["生","shēng","to be born; student; unfamiliar",[]],
+    ["少","shǎo","few, little; seldom",[]],
+    ["火","huǒ","fire",[]]
+  ],
+  words: [
+    ["六十個人","liùshí ge rén","sixty people"],
+    ["八十六","bāshíliù","eighty-six"],
+    ["三十二個人","sānshí'èr ge rén","thirty-two people"],
+    ["十天半","shí tiān bàn","ten and a half days"]
+  ],
+  sentences: [
+    ["人 太 少 。","Rén tài shǎo.","There are too few people."],
+    ["人 不 少 。","Rén bù shǎo.","There are quite a lot of people."],
+    ["羊 太 少 。","Yáng tài shǎo.","There are too few sheep."],
+    ["牛 太 大 。","Niú tài dà.","The ox is too big."],
+    ["牛 羊 不 少 。","Niú yáng bù shǎo.","There are quite a lot of cattle and sheep."]
+  ],
+  grammar: [
+    {t:"Numbers from 1 to 99", p:"Numbers are built like addition and multiplication: <b>十 + digit</b> gives 11 to 19, <b>digit + 十</b> gives the tens, and <b>digit + 十 + digit</b> gives everything else.", ex:[["十一","shíyī","11"],["二十","èrshí","20"],["六十二","liùshí'èr","62"],["八十一","bāshíyī","81"]]},
+    {t:"The measure word 個", p:"In Chinese, a number never goes directly before a noun: you need a <b>measure word</b>. 個 is the most common one: <b>number + 個 + noun</b>. In speech it is often said with the neutral tone: <i>ge</i>.", ex:[["一個人","yí ge rén","one person"],["三個人","sān ge rén","three people"],["六十個人","liùshí ge rén","sixty people"]]},
+    {t:"Negation with 不", p:"不 goes <b>before</b> the adjective or verb. It is pronounced <i>bù</i>, but becomes <i>bú</i> before a 4th tone.", ex:[["不大","bú dà","not big"],["不少","bù shǎo","quite a lot"]]},
+    {t:"太 “too” and 不太 “not very”", p:"太 + adjective = <b>too</b>. 不太 + adjective = <b>not very</b> (a softer way to say no).", ex:[["太大","tài dà","too big"],["太少","tài shǎo","too few"],["不太大","bú tài dà","not very big"]]},
+    {t:"Compound words", p:"Many words are made of two characters whose meanings combine: big + person = adult; above + noon = morning. Repeating a character can mean “every”: 天天 = every day.", ex:[["大人","dàrén","adult"],["上午","shàngwǔ","morning"],["下午","xiàwǔ","afternoon"],["天天","tiāntiān","every day"]]}
+  ]
+},
+{
+  id: "b", code: "B", title: "Introduction (2)",
+  sub: "Pronunciation, family, dates and 31 characters",
+  chars: [
+    ["四","sì","four",[["十四","shísì","fourteen"],["四十","sìshí","forty"],["四十四","sìshísì","forty-four"]]],
+    ["五","wǔ","five",[["十五","shíwǔ","fifteen"],["五十","wǔshí","fifty"],["五十五","wǔshíwǔ","fifty-five"]]],
+    ["七","qī","seven",[["十七","shíqī","seventeen"],["七十","qīshí","seventy"],["七十二","qīshí'èr","seventy-two"]]],
+    ["九","jiǔ","nine",[["十九","shíjiǔ","nineteen"],["九十七","jiǔshíqī","ninety-seven"],["九十九","jiǔshíjiǔ","ninety-nine"]]],
+    ["口","kǒu","mouth; (measure word for family members); opening",[["幾口人","jǐ kǒu rén","how many people (in a family)?"],["四口人","sì kǒu rén","four people (in a family)"],["人口","rénkǒu","population"],["門口","ménkǒu","doorway"]]],
+    ["日","rì","sun; day (date)",[["日文","Rìwén","Japanese (language)"],["五月一日","Wǔyuè yī rì","May 1st"],["生日","shēngrì","birthday"]]],
+    ["文","wén","writing, text; language",[["中文","Zhōngwén","Chinese (language)"]]],
+    ["中","zhōng","middle",[["中午","zhōngwǔ","noon"],["中國","Zhōngguó","China"],["中國人","Zhōngguórén","Chinese (person)"]]],
+    ["白","bái","white; Bai (surname)",[["白馬","bái mǎ","white horse"],["白天","báitiān","daytime"],["很白","hěn bái","very white"],["不白","bù bái","not white"],["不太白","bú tài bái","not very white"]]],
+    ["小","xiǎo","small; young",[["小山","xiǎo shān","small hill"],["小牛","xiǎo niú","calf"],["小羊","xiǎo yáng","lamb"]]],
+    ["心","xīn","heart",[["中心","zhōngxīn","center"],["小心","xiǎoxīn","to be careful"]]],
+    ["手","shǒu","hand",[["手工","shǒugōng","handmade"],["小手","xiǎo shǒu","small hand"]]],
+    ["子","zi / zǐ","(noun suffix); child",[["兒子","érzi","son"],["刀子","dāozi","knife"],["個子","gèzi","height, build"],["王子","wángzǐ","prince"]]],
+    ["水","shuǐ","water",[["水上","shuǐ shàng","on the water"],["水下","shuǐ xià","underwater"],["山水","shānshuǐ","landscape"],["水牛","shuǐniú","water buffalo"],["口水","kǒushuǐ","saliva"]]],
+    ["刀","dāo","knife; sword",[["大刀","dàdāo","broadsword"],["小刀","xiǎodāo","pocketknife"]]],
+    ["力","lì","strength, force",[["人力車","rénlìchē","rickshaw"],["馬力","mǎlì","horsepower"],["火力","huǒlì","thermal power"],["水力","shuǐlì","hydropower"]]],
+    ["門","mén","door",[["門上","mén shàng","on the door"],["大門","dàmén","main entrance"]]],
+    ["月","yuè","moon; month",[["一月","Yīyuè","January"],["二月","Èryuè","February"],["三月","Sānyuè","March"],["幾月","jǐ yuè","which month?"],["幾月幾日","jǐ yuè jǐ rì","what date?"],["上個月","shàng ge yuè","last month"],["下個月","xià ge yuè","next month"],["一個月","yí ge yuè","one month"],["半個月","bàn ge yuè","half a month"],["一個半月","yí ge bàn yuè","a month and a half"],["幾個月","jǐ ge yuè","how many months?; a few months"]]],
+    ["兒","ér","son; child; (suffix -r)",[["大兒子","dà érzi","eldest son"],["二兒子","èr érzi","second son"],["小兒子","xiǎo érzi","youngest son"],["幾個兒子","jǐ ge érzi","how many sons?"],["女兒","nǚ'ér","daughter"]]],
+    ["幾","jǐ","how many?; a few",[["幾個人","jǐ ge rén","how many people?; a few people"],["幾個工人","jǐ ge gōngrén","how many workers?"],["幾天","jǐ tiān","how many days?; a few days"]]],
+    ["也","yě","also, too",[]],
+    ["巴","bā","(used in 巴黎 Paris)",[["巴黎","Bālí","Paris"]]],
+    ["山","shān","mountain; hill",[["大山","dà shān","big mountain"],["火山","huǒshān","volcano"],["山羊","shānyáng","goat"],["上山","shàng shān","to go up the mountain"],["下山","xià shān","to go down the mountain"],["山上","shān shàng","on the mountain"],["山下","shān xià","at the foot of the mountain"]]],
+    ["馬","mǎ","horse; Ma (surname)",[["小馬","xiǎo mǎ","foal, pony"],["木馬","mùmǎ","wooden horse"],["上馬","shàng mǎ","to get on a horse"],["下馬","xià mǎ","to get off a horse"],["馬車","mǎchē","horse cart"],["馬上","mǎshàng","right away"]]],
+    ["女","nǚ","woman; female",[["大女兒","dà nǚ'ér","eldest daughter"],["二女兒","èr nǚ'ér","second daughter"],["小女兒","xiǎo nǚ'ér","youngest daughter"],["女王","nǚwáng","queen"],["女人","nǚrén","woman"],["女生","nǚshēng","female student; girl"]]],
+    ["車","chē","vehicle, car",[["大車","dà chē","big vehicle"],["小車","xiǎo chē","small car"],["火車","huǒchē","train"],["水車","shuǐchē","waterwheel"],["上車","shàng chē","to get in (a vehicle)"],["下車","xià chē","to get out (of a vehicle)"]]],
+    ["老","lǎo","old; (prefix)",[["很老","hěn lǎo","very old"],["不老","bù lǎo","not old"],["老人","lǎorén","elderly person"],["老太太","lǎo tàitai","old lady"],["老馬","lǎo mǎ","old horse"]]],
+    ["是","shì","to be",[["是中國人","shì Zhōngguórén","to be Chinese"],["不是大夫","bú shì dàifu","not to be a doctor"]]],
+    ["國","guó","country",[["大國","dàguó","big country"],["國王","guówáng","king"]]],
+    ["我","wǒ","I; me",[]],
+    ["很","hěn","very",[["很大","hěn dà","very big"]]]
+  ],
+  words: [
+    ["媽媽","māma","mom"],["爸爸","bàba","dad"],["哥哥","gēge","older brother"],["姐姐","jiějie","older sister"],
+    ["弟弟","dìdi","younger brother"],["妹妹","mèimei","younger sister"],["爺爺","yéye","grandfather (father's side)"],
+    ["奶奶","nǎinai","grandmother (father's side)"],["外公","wàigōng","grandfather (mother's side)"],["外婆","wàipó","grandmother (mother's side)"],
+    ["妻子","qīzi","wife"],["丈夫","zhàngfu","husband"],["學生","xuésheng","student"],["醫生","yīshēng","doctor"],["律師","lǜshī","lawyer"],
+    ["我們","wǒmen","we, us"],["你們","nǐmen","you (plural)"],["他們","tāmen","they, them"],["咱們","zánmen","we (including you)"],
+    ["衣服","yīfu","clothes"],["桌子","zhuōzi","table"],["房子","fángzi","house"],["本子","běnzi","notebook"],["褲子","kùzi","trousers"],
+    ["眼睛","yǎnjing","eyes"],["頭髮","tóufa","hair"],["早上","zǎoshang","morning"],["晚上","wǎnshang","evening"],
+    ["喜歡","xǐhuan","to like"],["休息","xiūxi","to rest"],["回去","huíqu","to go back"],["什麼","shénme","what?"],["怎麼","zěnme","how?"],
+    ["上邊","shàngbian","above, on top"],["下邊","xiàbian","below, underneath"],["裡邊","lǐbian","inside"],["外邊","wàibian","outside"],
+    ["左邊","zuǒbian","left side"],["右邊","yòubian","right side"],["前邊","qiánbian","in front"],["後邊","hòubian","behind"],
+    ["東西南北","dōng xī nán běi","east, west, south, north"],["上下左右","shàng xià zuǒ yòu","up, down, left, right"],
+    ["前後裡外","qián hòu lǐ wài","front, back, inside, outside"],["父母兒女","fù mǔ ér nǚ","father, mother, son, daughter"],
+    ["兄弟姊妹","xiōng dì zǐ mèi","older brother, younger brother, older sister, younger sister"],["男女老幼","nán nǚ lǎo yòu","men, women, old, young"],
+    ["大小多少","dà xiǎo duō shǎo","big, small, many, few"],["高矮胖瘦","gāo ǎi pàng shòu","tall, short, fat, thin"],
+    ["新舊好壞","xīn jiù hǎo huài","new, old, good, bad"],["輕重長短","qīng zhòng cháng duǎn","light, heavy, long, short"],
+    ["遠近高低","yuǎn jìn gāo dī","far, near, high, low"],["紅黃藍綠","hóng huáng lán lǜ","red, yellow, blue, green"],
+    ["早晚先後","zǎo wǎn xiān hòu","early, late, before, after"],
+    ["鼠","shǔ","rat"],["虎","hǔ","tiger"],["兔","tù","rabbit"],["龍","lóng","dragon"],["蛇","shé","snake"],["猴","hóu","monkey"],["雞","jī","rooster, chicken"],["狗","gǒu","dog"],["豬","zhū","pig"],
+    ["一條路","yì tiáo lù","a road"],["兩個人","liǎng ge rén","two people"],["三朵花","sān duǒ huā","three flowers"],["四本書","sì běn shū","four books"],
+    ["五枝筆","wǔ zhī bǐ","five pens"],["六張紙","liù zhāng zhǐ","six sheets of paper"],["七封信","qī fēng xìn","seven letters"],
+    ["八輛車","bā liàng chē","eight cars"],["九顆星","jiǔ kē xīng","nine stars"],["十隻手","shí zhī shǒu","ten hands"]
+  ],
+  sentences: [
+    ["你 好 !","Nǐ hǎo!","Hello!"],
+    ["你 早 !","Nǐ zǎo!","Good morning!"],
+    ["你們 好 !","Nǐmen hǎo!","Hello everyone!"],
+    ["你 好 嗎 ?","Nǐ hǎo ma?","How are you?"],
+    ["我 很 好 , 你 呢 ?","Wǒ hěn hǎo, nǐ ne?","I'm fine, and you?"],
+    ["謝謝 , 我 也 很 好 。","Xièxie, wǒ yě hěn hǎo.","Thanks, I'm fine too."],
+    ["你 忙 嗎 ?","Nǐ máng ma?","Are you busy?"],
+    ["我 很 忙 , 你 呢 ?","Wǒ hěn máng, nǐ ne?","I'm very busy, and you?"],
+    ["我 也 很 忙 。","Wǒ yě hěn máng.","I'm very busy too."],
+    ["謝謝 !","Xièxie!","Thank you!"],
+    ["不 客氣 !","Bú kèqi!","You're welcome!"],
+    ["不 謝 !","Bú xiè!","Don't mention it!"],
+    ["沒 什麼 !","Méi shénme!","It's nothing!"],
+    ["對不起 !","Duìbuqǐ!","Sorry!"],
+    ["沒 關係 !","Méi guānxi!","It doesn't matter!"],
+    ["再見 !","Zàijiàn!","Goodbye!"],
+    ["漢語 難 嗎 ?","Hànyǔ nán ma?","Is Chinese difficult?"],
+    ["漢語 不 難 。","Hànyǔ bù nán.","Chinese isn't difficult."],
+    ["漢語 很 難 。","Hànyǔ hěn nán.","Chinese is very difficult."],
+    ["你 懂 嗎 ?","Nǐ dǒng ma?","Do you understand?"],
+    ["我 不 懂 。","Wǒ bù dǒng.","I don't understand."],
+    ["你 累 嗎 ?","Nǐ lèi ma?","Are you tired?"],
+    ["我 不 累 。","Wǒ bú lèi.","I'm not tired."],
+    ["對 嗎 ?","Duì ma?","Is that right?"],
+    ["不 對 。","Bú duì.","That's not right."],
+    ["這 是 誰 的 ?","Zhè shì shéi de?","Whose is this?"],
+    ["你 先 走 吧 !","Nǐ xiān zǒu ba!","You go first!"],
+    ["那 是 你 的 筆 吧 ?","Nà shì nǐ de bǐ ba?","That's your pen, right?"],
+    ["你 去 哪兒 ?","Nǐ qù nǎr?","Where are you going?"],
+    ["我 去 那兒 。","Wǒ qù nàr.","I'm going there."],
+    ["你 有 空兒 嗎 ?","Nǐ yǒu kòngr ma?","Are you free?"],
+    ["對不起 , 我 沒 空兒 。","Duìbuqǐ, wǒ méi kòngr.","Sorry, I'm not free."],
+    ["我 有 事 。","Wǒ yǒu shì.","I have something to do."],
+    ["請 等 一下兒 。","Qǐng děng yíxiàr.","Please wait a moment."],
+    ["休息 一會兒 。","Xiūxi yíhuìr.","Rest for a moment."],
+    ["我 會 說 一點兒 漢語 。","Wǒ huì shuō yìdiǎnr Hànyǔ.","I can speak a little Chinese."],
+    ["你 屬 什麼 ?","Nǐ shǔ shénme?","What's your Chinese zodiac sign?"],
+    ["我 屬 馬 。","Wǒ shǔ mǎ.","I was born in the year of the Horse."],
+    ["爸爸 的 爸爸 是 爺爺 。","Bàba de bàba shì yéye.","Dad's dad is grandpa."],
+    ["媽媽 的 媽媽 是 外婆 。","Māma de māma shì wàipó.","Mom's mom is grandma."],
+    ["我 爸爸 是 老師 。","Wǒ bàba shì lǎoshī.","My dad is a teacher."],
+    ["我 媽媽 是 醫生 。","Wǒ māma shì yīshēng.","My mom is a doctor."],
+    ["我 哥哥 是 工人 。","Wǒ gēge shì gōngrén.","My older brother is a worker."],
+    ["我 姐姐 是 律師 。","Wǒ jiějie shì lǜshī.","My older sister is a lawyer."],
+    ["我 和 妹妹 是 學生 。","Wǒ hé mèimei shì xuésheng.","My younger sister and I are students."],
+    ["我 是 大夫 。","Wǒ shì dàifu.","I am a doctor."],
+    ["是 我 。","Shì wǒ.","It's me."],
+    ["手 太 大 。","Shǒu tài dà.","The hands are too big."]
+  ],
+  grammar: [
+    {t:"Tones and the 3rd tone", p:"Chinese has 4 tones plus a neutral tone. When two 3rd tones follow each other, the first is pronounced as a <b>2nd tone</b> (the written pinyin stays 3rd tone). Before any other tone, a 3rd tone does not rise again: it stays low.", ex:[["你好","nǐ hǎo → ní hǎo","hello"],["老師","lǎoshī","teacher"],["很好","hěn hǎo → hén hǎo","very good"]]},
+    {t:"Tone change of 不", p:"不 is pronounced <i>bù</i>, except before a 4th tone, where it becomes <b>bú</b>.", ex:[["不好","bù hǎo","not good"],["不是","bú shì","is not"],["不對","bú duì","not right"]]},
+    {t:"Tone change of 一", p:"一 is said <i>yī</i> on its own or inside a number. Before a 1st, 2nd or 3rd tone it becomes <b>yì</b>; before a 4th tone (or 個) it becomes <b>yí</b>.", ex:[["一天","yì tiān","one day"],["一點","yìdiǎn","a little"],["一個","yí ge","one (of something)"],["十一","shíyī","eleven"]]},
+    {t:"The particles 嗎, 呢, 吧, 的", p:"<b>嗎</b> at the end of a sentence turns it into a yes/no question. <b>呢</b> bounces the question back: “and you?”. <b>吧</b> softens (a suggestion, “right?”). <b>的</b> marks possession.", ex:[["你好嗎?","Nǐ hǎo ma?","How are you?"],["你呢?","Nǐ ne?","And you?"],["你先走吧!","Nǐ xiān zǒu ba!","You go first!"],["我的筆","wǒ de bǐ","my pen"]]},
+    {t:"很 + adjective", p:"To say “X is big”, you do <b>not</b> use 是: the adjective comes straight after the subject, usually preceded by 很 (which doesn't really mean “very” here).", ex:[["我很好。","Wǒ hěn hǎo.","I'm fine."],["漢語很難。","Hànyǔ hěn nán.","Chinese is difficult."],["我很忙。","Wǒ hěn máng.","I'm busy."]]},
+    {t:"是 “to be” + noun", p:"<b>A 是 B</b> links two nouns. In the negative: <b>A 不是 B</b>.", ex:[["我是大夫。","Wǒ shì dàifu.","I am a doctor."],["他不是大夫。","Tā bú shì dàifu.","He is not a doctor."]]},
+    {t:"幾 “how many?” + measure word", p:"幾 asks about a small quantity (usually under 10) and goes before a measure word. Depending on context, it can also mean “a few”.", ex:[["幾個人?","jǐ ge rén?","how many people?"],["幾口人?","jǐ kǒu rén?","how many people in the family?"],["幾天","jǐ tiān","a few days"]]},
+    {t:"Months and dates", p:"Months are numbered: <b>number + 月</b>. Dates go from largest to smallest: month + 月 + day + 日. “Last / next month”: 上個月 / 下個月.", ex:[["一月","Yīyuè","January"],["五月一日","Wǔyuè yī rì","May 1st"],["七月十四日","Qīyuè shísì rì","July 14th"],["下個月","xià ge yuè","next month"]]},
+    {t:"Measure words", p:"Each noun has its own measure word: 條 (long things), 朵 (flowers), 本 (books), 枝 (pens), 張 (flat things), 封 (letters), 輛 (vehicles), 顆 (small round things), 隻 (one hand, animals). Before a measure word, “two” is <b>兩</b>, not 二.", ex:[["一條路","yì tiáo lù","a road"],["兩個人","liǎng ge rén","two people"],["四本書","sì běn shū","four books"],["八輛車","bā liàng chē","eight cars"]]},
+    {t:"The 兒 (-r) suffix and Taiwanese usage", p:"In Beijing, people often add an <i>-r</i> at the end of words (哪兒, 一點兒). In Taiwan it is rarely used: people say 哪裡 nǎlǐ, 一點 yìdiǎn, 一下 yíxià instead.", ex:[["哪兒 / 哪裡","nǎr / nǎlǐ","where?"],["一點兒 / 一點","yìdiǎnr / yìdiǎn","a little"]]}
+  ]
+},
+{
+  id: "1", code: "1", title: "Introducing yourself",
+  sub: "Name, nationality, city, job, languages",
+  chars: [
+    ["這","zhè","this",[]],
+    ["他","tā","he; him",[]],
+    ["她","tā","she; her",[]],
+    ["你","nǐ","you",[["你好","nǐ hǎo","hello"],["你早","nǐ zǎo","good morning"]]],
+    ["您","nín","you (polite)",[["您貴姓?","nín guìxìng?","What is your surname? (polite)"]]],
+    ["叫","jiào","to be called; to call",[]],
+    ["姓","xìng","to be surnamed; surname",[]],
+    ["家","jiā","family; home",[]],
+    ["在","zài","to be (located) at",[]],
+    ["嗎","ma","(yes/no question particle)",[]],
+    ["呢","ne","(question particle: \"and …?\")",[]],
+    ["都","dōu","all; both",[]],
+    ["新","xīn","new",[]],
+    ["的","de","(possessive / modifier particle)",[]],
+    ["好","hǎo","good; well",[]],
+    ["貴","guì","expensive; (honorific)",[]],
+    ["學","xué","to study, to learn",[["學習","xuéxí","to study"]]],
+    ["住","zhù","to live",[["住在","zhùzài","to live in"]]],
+    ["哪","nǎ","which?",[["哪國人","nǎ guó rén","what nationality?"],["哪兒","nǎr","where? (Beijing)"],["哪裡","nǎlǐ","where? (Taiwan)"]]],
+    ["區","qū","district",[]],
+    ["對","duì","correct, right",[]],
+    ["多","duō","many, much",[]],
+    ["早","zǎo","early",[]],
+    ["誰","shéi","who?",[]],
+    ["會","huì","can, to know how to",[]],
+    ["說","shuō","to speak; to say",[]],
+    ["做","zuò","to do, to make",[]]
+  ],
+  words: [
+    ["先生","xiānsheng","Mr.; sir"],["中國","Zhōngguó","China"],["法國","Fǎguó","France"],["北京","Běijīng","Beijing"],
+    ["認識","rènshi","to know (someone); to meet"],["同學","tóngxué","classmate"],["中學","zhōngxué","secondary school"],
+    ["朋友","péngyou","friend"],["什麼","shénme","what?"],["漢語","Hànyǔ","Chinese (language)"],["太太","tàitai","Mrs.; wife"],
+    ["小姐","xiǎojiě","Miss"],["怎麼樣","zěnmeyàng","how is it?; how about?"],["馬馬虎虎","mǎmǎhūhū","so-so"],["老師","lǎoshī","teacher"],
+    ["大學","dàxué","university"],["名字","míngzi","name"],["上海","Shànghǎi","Shanghai"],["外語","wàiyǔ","foreign language"],
+    ["工作","gōngzuò","work, job; to work"],["請","qǐng","please"],["介紹","jièshào","to introduce"],["一下","yíxià","briefly, a bit"],
+    ["自己","zìjǐ","oneself"],["郊區","jiāoqū","suburbs"],
+    ["王大山","Wáng Dàshān","Wang Dashan (name)"],["白小梅","Bái Xiǎoméi","Bai Xiaomei (name)"],["馬小月","Mǎ Xiǎoyuè","Ma Xiaoyue (name)"],["小李","Xiǎo Lǐ","Little Li (familiar)"],
+    ["法國人","Fǎguórén","French (person)"],["台灣人","Táiwānrén","Taiwanese (person)"],["德國人","Déguórén","German (person)"],["美國人","Měiguórén","American (person)"],
+    ["義大利人","Yìdàlìrén","Italian (person)"],["英國人","Yīngguórén","British (person)"],["西班牙人","Xībānyárén","Spanish (person)"],
+    ["荷蘭人","Hélánrén","Dutch (person)"],["波蘭人","Bōlánrén","Polish (person)"],["日本人","Rìběnrén","Japanese (person)"],
+    ["韓國人","Hánguórén","Korean (person)"],["越南人","Yuènánrén","Vietnamese (person)"],["寮國人","Liáoguórén","Laotian (person)"],["柬埔寨人","Jiǎnpǔzhàirén","Cambodian (person)"],
+    ["巴黎人","Bālírén","Parisian"],["馬賽人","Mǎsàirén","person from Marseille"],["里昂人","Lǐ'ángrén","person from Lyon"],["布列塔尼人","Bùliètǎnírén","Breton"],
+    ["北京人","Běijīngrén","person from Beijing"],["上海人","Shànghǎirén","person from Shanghai"],["香港人","Xiānggǎngrén","person from Hong Kong"],
+    ["四川人","Sìchuānrén","person from Sichuan"],["台北","Táiběi","Taipei"],
+    ["記者","jìzhě","journalist"],["職員","zhíyuán","employee"],["會計","kuàijì","accountant"],["護士","hùshi","nurse"],
+    ["工程師","gōngchéngshī","engineer"],["祕書","mìshū","secretary"],["軍人","jūnrén","soldier"],["經理","jīnglǐ","manager"],["運動員","yùndòngyuán","athlete"],
+    ["英語","Yīngyǔ","English (language)"],["德語","Déyǔ","German (language)"],["西班牙語","Xībānyáyǔ","Spanish (language)"],
+    ["義大利語","Yìdàlìyǔ","Italian (language)"],["日語","Rìyǔ","Japanese (language)"],["法語","Fǎyǔ","French (language)"]
+  ],
+  sentences: [
+    ["您 貴姓 ?","Nín guìxìng?","What is your surname? (polite)"],
+    ["我 姓 王 , 叫 王大山 。","Wǒ xìng Wáng, jiào Wáng Dàshān.","My surname is Wang, my name is Wang Dashan."],
+    ["你 叫 什麼 名字 ?","Nǐ jiào shénme míngzi?","What's your name?"],
+    ["你 姓 什麼 ?","Nǐ xìng shénme?","What's your surname?"],
+    ["你 是 哪國人 ?","Nǐ shì nǎ guó rén?","What nationality are you?"],
+    ["我 是 法國人 。","Wǒ shì Fǎguórén.","I'm French."],
+    ["你 是 中國人 嗎 ?","Nǐ shì Zhōngguórén ma?","Are you Chinese?"],
+    ["不是 , 我 是 法國人 。","Búshì, wǒ shì Fǎguórén.","No, I'm French."],
+    ["你 是 哪兒 的 人 ?","Nǐ shì nǎr de rén?","Where are you from?"],
+    ["我 是 巴黎人 。","Wǒ shì Bālírén.","I'm from Paris."],
+    ["你 住 哪兒 ?","Nǐ zhù nǎr?","Where do you live?"],
+    ["我 住在 巴黎 。","Wǒ zhùzài Bālí.","I live in Paris."],
+    ["我 不 住在 巴黎 , 我 住在 馬賽 。","Wǒ bú zhùzài Bālí, wǒ zhùzài Mǎsài.","I don't live in Paris, I live in Marseille."],
+    ["我 住 十五 區 。","Wǒ zhù shíwǔ qū.","I live in the 15th district."],
+    ["你 家 在 哪兒 ?","Nǐ jiā zài nǎr?","Where is your home?"],
+    ["我 家 在 北京 。","Wǒ jiā zài Běijīng.","My home is in Beijing."],
+    ["你 做 什麼 工作 ?","Nǐ zuò shénme gōngzuò?","What do you do (for work)?"],
+    ["我 是 工程師 。","Wǒ shì gōngchéngshī.","I'm an engineer."],
+    ["你 是 學生 嗎 ?","Nǐ shì xuésheng ma?","Are you a student?"],
+    ["不是 , 我 是 老師 。","Búshì, wǒ shì lǎoshī.","No, I'm a teacher."],
+    ["你 會 說 漢語 嗎 ?","Nǐ huì shuō Hànyǔ ma?","Can you speak Chinese?"],
+    ["我 不 會 說 漢語 , 我 會 說 法語 。","Wǒ bú huì shuō Hànyǔ, wǒ huì shuō Fǎyǔ.","I can't speak Chinese, I speak French."],
+    ["你 會 說 什麼 外語 ?","Nǐ huì shuō shénme wàiyǔ?","What foreign languages can you speak?"],
+    ["我 會 說 英語 , 也 會 說 日語 。","Wǒ huì shuō Yīngyǔ, yě huì shuō Rìyǔ.","I can speak English, and Japanese too."],
+    ["這 是 我 的 朋友 。","Zhè shì wǒ de péngyou.","This is my friend."],
+    ["這 是 白 小姐 。","Zhè shì Bái xiǎojiě.","This is Miss Bai."],
+    ["他們 都 是 新 同學 。","Tāmen dōu shì xīn tóngxué.","They are all new classmates."],
+    ["你 認識 他 嗎 ?","Nǐ rènshi tā ma?","Do you know him?"],
+    ["他 是 我 的 中學 同學 。","Tā shì wǒ de zhōngxué tóngxué.","He's my secondary-school classmate."],
+    ["王 先生 是 中國人 , 太太 呢 ?","Wáng xiānsheng shì Zhōngguórén, tàitai ne?","Mr. Wang is Chinese, and his wife?"],
+    ["北京 怎麼樣 ?","Běijīng zěnmeyàng?","What is Beijing like?"],
+    ["北京 很 好 , 人 很 多 。","Běijīng hěn hǎo, rén hěn duō.","Beijing is great, there are lots of people."],
+    ["誰 是 你 的 老師 ?","Shéi shì nǐ de lǎoshī?","Who is your teacher?"],
+    ["她 是 我 的 漢語 老師 。","Tā shì wǒ de Hànyǔ lǎoshī.","She's my Chinese teacher."],
+    ["你 在 大學 學習 漢語 嗎 ?","Nǐ zài dàxué xuéxí Hànyǔ ma?","Do you study Chinese at university?"],
+    ["對 , 我 在 大學 學習 漢語 。","Duì, wǒ zài dàxué xuéxí Hànyǔ.","Yes, I study Chinese at university."],
+    ["請 介紹 一下 你 自己 。","Qǐng jièshào yíxià nǐ zìjǐ.","Please introduce yourself."],
+    ["她 是 台灣人 , 住在 台北 。","Tā shì Táiwānrén, zhùzài Táiběi.","She's Taiwanese, she lives in Taipei."],
+    ["我 叫 馬京生 , 是 中國人 。","Wǒ jiào Mǎ Jīngshēng, shì Zhōngguórén.","My name is Ma Jingsheng, I'm Chinese."]
+  ],
+  dialogue: {
+    title: "Sample dialogue",
+    note: "Written from the lesson vocabulary (the textbook dialogues are audio only).",
+    lines: [
+      ["A","你 好 ! 我 叫 白小梅 。 你 叫 什麼 名字 ?","Nǐ hǎo! Wǒ jiào Bái Xiǎoméi. Nǐ jiào shénme míngzi?","Hello! My name is Bai Xiaomei. What's your name?"],
+      ["B","我 姓 王 , 叫 王大山 。","Wǒ xìng Wáng, jiào Wáng Dàshān.","My surname is Wang, my name is Wang Dashan."],
+      ["A","你 是 哪國人 ?","Nǐ shì nǎ guó rén?","What nationality are you?"],
+      ["B","我 是 中國人 , 住在 北京 。 你 呢 ?","Wǒ shì Zhōngguórén, zhùzài Běijīng. Nǐ ne?","I'm Chinese, I live in Beijing. And you?"],
+      ["A","我 是 法國人 , 我 家 在 巴黎 。","Wǒ shì Fǎguórén, wǒ jiā zài Bālí.","I'm French, my home is in Paris."],
+      ["B","你 會 說 漢語 嗎 ?","Nǐ huì shuō Hànyǔ ma?","Can you speak Chinese?"],
+      ["A","會 , 我 在 大學 學習 漢語 。","Huì, wǒ zài dàxué xuéxí Hànyǔ.","Yes, I study Chinese at university."],
+      ["B","北京 怎麼樣 ?","Běijīng zěnmeyàng?","What is Beijing like?"],
+      ["A","很 好 , 人 很 多 !","Hěn hǎo, rén hěn duō!","Great, there are lots of people!"]
+    ]
+  },
+  grammar: [
+    {t:"Sentences with 是: A 是 B", p:"是 links the subject to a noun (identity, nationality, job). Negative: <b>不是</b>. To answer “yes” or “no”, repeat the verb: 是 / 不是.", ex:[["我是法國人。","Wǒ shì Fǎguórén.","I'm French."],["他不是老師。","Tā bú shì lǎoshī.","He is not a teacher."],["是,我是學生。","Shì, wǒ shì xuésheng.","Yes, I'm a student."]]},
+    {t:"Questions with 嗎", p:"Turn a statement into a yes/no question by adding <b>嗎</b> at the end, without changing the word order.", ex:[["你是中國人。→ 你是中國人嗎?","Nǐ shì Zhōngguórén ma?","Are you Chinese?"],["你認識他嗎?","Nǐ rènshi tā ma?","Do you know him?"]]},
+    {t:"Question words stay in place", p:"什麼 (what), 誰 (who), 哪 (which), 哪兒/哪裡 (where), 怎麼樣 (how) go <b>where the answer will be</b>. Never use 嗎 with these words!", ex:[["你叫什麼名字?","Nǐ jiào shénme míngzi?","What's your name?"],["誰是你的老師?","Shéi shì nǐ de lǎoshī?","Who is your teacher?"],["你是哪國人?","Nǐ shì nǎ guó rén?","What nationality are you?"],["你住哪兒?","Nǐ zhù nǎr?","Where do you live?"]]},
+    {t:"呢: “and you?”", p:"After a noun or pronoun, <b>呢</b> repeats the previous question without saying it again.", ex:[["我是法國人,你呢?","Wǒ shì Fǎguórén, nǐ ne?","I'm French, and you?"],["王先生是中國人,太太呢?","Wáng xiānsheng shì Zhōngguórén, tàitai ne?","Mr. Wang is Chinese, and his wife?"]]},
+    {t:"姓 and 叫: surname and full name", p:"<b>姓</b> + surname; <b>叫</b> + full name (or given name). The polite way to ask someone's surname: <b>您貴姓?</b>", ex:[["我姓王。","Wǒ xìng Wáng.","My surname is Wang."],["我叫王大山。","Wǒ jiào Wáng Dàshān.","My name is Wang Dashan."],["您貴姓?","Nín guìxìng?","What is your surname? (polite)"]]},
+    {t:"的: possession", p:"<b>owner + 的 + thing</b>. With family and close relationships, 的 can be dropped: 我媽媽, 我家.", ex:[["我的朋友","wǒ de péngyou","my friend"],["你的老師","nǐ de lǎoshī","your teacher"],["我家","wǒ jiā","my home / my family"]]},
+    {t:"也 and 都: always before the verb", p:"<b>也</b> (also) and <b>都</b> (all) go after the subject and <b>before the verb</b>, never at the end of the sentence.", ex:[["我也是學生。","Wǒ yě shì xuésheng.","I'm a student too."],["他們都是新同學。","Tāmen dōu shì xīn tóngxué.","They are all new classmates."],["我也會說日語。","Wǒ yě huì shuō Rìyǔ.","I can speak Japanese too."]]},
+    {t:"會 + verb: knowing how to", p:"<b>會</b> expresses a learned skill. Negative: <b>不會</b>. Short answer: 會 / 不會.", ex:[["你會說漢語嗎?","Nǐ huì shuō Hànyǔ ma?","Can you speak Chinese?"],["我不會說英語。","Wǒ bú huì shuō Yīngyǔ.","I can't speak English."]]},
+    {t:"在 and 住在: places", p:"<b>在</b> alone = “to be located at”. <b>住在</b> + place = “to live in”. 在 + place can also go before a verb: “to do something at a place”.", ex:[["我家在北京。","Wǒ jiā zài Běijīng.","My home is in Beijing."],["我住在巴黎。","Wǒ zhùzài Bālí.","I live in Paris."],["我在大學學習漢語。","Wǒ zài dàxué xuéxí Hànyǔ.","I study Chinese at university."]]},
+    {t:"Adjectives without 是", p:"As seen in Lesson B, an adjective follows the subject directly, with 很: never <s>北京是好</s>.", ex:[["北京很好。","Běijīng hěn hǎo.","Beijing is great."],["人很多。","Rén hěn duō.","There are lots of people."]]}
+  ]
+}
+];
+
+</script>
+<script>
+{
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const PUNCT={",":"，","?":"？","!":"！","。":"。"};
+const isP=t=>t in PUNCT;
+const norm=s=>String(s).replace(/[\s,，。？?！!、.．·]/g,"");
+const fw=s=>String(s).replace(/,/g,"，").replace(/\?/g,"？").replace(/!/g,"！");
+const SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+
+/* ---------- data ---------- */
+const ITEMS={},BYL={};
+for(const L of LESSONS){
+  const list=[],seen=new Set();
+  const add=(o)=>{if(seen.has(o.zh))return;seen.add(o.zh);o.id=L.id+":"+o.zh;o.L=L.id;ITEMS[o.id]=o;list.push(o)};
+  for(const c of L.chars)add({zh:c[0],py:c[1],en:c[2],kind:"char",ex:c[3]});
+  for(const c of L.chars)for(const w of c[3])add({zh:w[0],py:w[1],en:w[2],kind:"word"});
+  for(const w of L.words)add({zh:w[0],py:w[1],en:w[2],kind:"word"});
+  for(const s of L.sentences){const tk=s[0].split(" ");add({zh:tk.map(t=>PUNCT[t]||t).join(""),py:s[1],en:s[2],kind:"sent",tk})}
+  BYL[L.id]=list;
+}
+const ALL=Object.values(ITEMS);
+const lesson=id=>LESSONS.find(l=>l.id===id);
+
+/* ---------- state and saving ---------- */
+const KEY="xuezhongwen-tc-v1";
+let S={pinyin:true,known:{},err:{},tests:[],t:0};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+let ref=null,writing=Promise.resolve(),pushT=0,syncState="local";
+function save(){S.t=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(ref){clearTimeout(pushT);pushT=setTimeout(push,1200)}}
+function push(){const body={json:JSON.stringify(S),t:S.t};writing=writing.then(()=>ref.set(body)).then(()=>{syncState="cloud"}).catch(()=>{syncState="local"})}
+async function initSync(){
+  try{
+    if(!window.claude||!window.claude.use)return;
+    const user=await window.claude.use("user");const db=await window.claude.use("db");
+    if(!user||!db)return;const id=await user.id();if(!id)return;
+    ref=db.doc("data/users/"+id+"/progress");
+    const snap=await ref.get();
+    if(snap.exists){const d=snap.data()||{};
+      if((d.t||0)>S.t&&d.json){S=Object.assign({pinyin:true,known:{},err:{},tests:[],t:0},JSON.parse(d.json));try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+      else if(S.t>(d.t||0))push();
+    }else if(S.t)push();
+    syncState="cloud";render();
+  }catch(e){ref=null}
+}
+
+/* ---------- audio ---------- */
+let voice=null;const canSpeak="speechSynthesis" in window;
+function pickVoice(){if(!canSpeak)return;const v=speechSynthesis.getVoices();
+  voice=v.find(x=>/zh[-_]TW/i.test(x.lang))||v.find(x=>/zh[-_](HK|Hant)/i.test(x.lang))||v.find(x=>/^zh|cmn/i.test(x.lang))||null}
+if(canSpeak){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function speak(t){if(!canSpeak)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/\s/g,""));u.lang=voice?voice.lang:"zh-TW";if(voice)u.voice=voice;u.rate=.8;speechSynthesis.speak(u)}catch(e){}}
+const spkBtn=t=>canSpeak?`<button class="spk" data-say="${esc(t)}" aria-label="Listen">${SPK}</button>`:"";
+
+/* ---------- progress ---------- */
+const errCount=()=>Object.keys(S.err).filter(k=>ITEMS[k]).length;
+function progress(lid){const l=BYL[lid];const k=l.filter(i=>S.known[i.id]&&!S.err[i.id]).length;return Math.round(100*k/l.length)}
+function record(it,ok){
+  if(ok){S.known[it.id]=1;const e=S.err[it.id];if(e){e.s=(e.s||0)+1;if(e.s>=2)delete S.err[it.id]}}
+  else{const e=S.err[it.id]||{n:0,s:0};e.n++;e.s=0;e.d=Date.now();S.err[it.id]=e}
+}
+
+/* ---------- navigation ---------- */
+let view="lecons",cur=null,sub="vocab",filt="all",query="";
+function route(){const h=location.hash.slice(1);
+  if(h.startsWith("lecon-")&&lesson(h.slice(6))){view="lecon";cur=h.slice(6)}
+  else if(h==="erreurs"||h==="bilans")view=h;else view="lecons";
+  render();window.scrollTo(0,0)}
+function go(h){if(location.hash==="#"+h)route();else location.hash=h}
+
+function header(){return `<header><span class="logo">學</span><div class="htitle">學中文<small>Traditional Chinese ⇄ English</small></div>
+ <button class="chip ${S.pinyin?"on":""}" id="pyT" aria-pressed="${S.pinyin}">拼音 ${S.pinyin?"on":"off"}</button></header>`}
+
+function render(){
+  const a=$("#app");
+  let h=header();
+  if(view==="lecons")h+=vLessons();
+  else if(view==="lecon")h+=vLesson();
+  else if(view==="erreurs")h+=vErrors();
+  else h+=vTests();
+  a.innerHTML=h;
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===(view==="lecon"?"lecons":view)));
+  const n=errCount(),bd=$("#badge");bd.textContent=n;bd.classList.toggle("hide",!n);
+}
+
+function vLessons(){
+  return `<h1>My lessons</h1><p class="sub">Vocabulary, grammar and exercises, from Chinese to English and from English to Chinese.</p>`+
+  LESSONS.map(L=>{const p=progress(L.id);return `<button class="lcard" data-go="lecon-${L.id}"><span class="seal">${L.code}</span>
+   <div style="flex:1"><b>Lesson ${L.code} · ${esc(L.title)}</b><span>${esc(L.sub)} · ${BYL[L.id].length} items</span>
+   <div class="bar"><i style="width:${p}%"></i></div></div><span class="cnt" style="background:none;color:var(--mute)">${p}%</span></button>`}).join("")+
+  `<p class="sync">${syncState==="cloud"?"Progress saved to your account":"Progress saved on this device"}</p>`;
+}
+
+function vLesson(){
+  const L=lesson(cur);
+  let h=`<button class="back" data-go="lecons">‹ Lessons</button><h1>Lesson ${L.code} · ${esc(L.title)}</h1><p class="sub">${esc(L.sub)}</p>
+  <div class="seg">${[["vocab","Vocabulary"],["gram","Grammar"],["train","Practice"]].map(([k,t])=>`<button data-sub="${k}" class="${sub===k?"on":""}">${t}</button>`).join("")}</div>`;
+  if(sub==="vocab")h+=vVocab(L);else if(sub==="gram")h+=vGram(L);else h+=vTrain(L);
+  return h;
+}
+function match(i){if(!query)return true;const q=query.toLowerCase();return i.zh.includes(query)||i.en.toLowerCase().includes(q)||i.py.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").includes(q.normalize("NFD").replace(/[̀-ͯ]/g,""))}
+function vVocab(L){
+  const items=BYL[L.id].filter(match);
+  const ch=items.filter(i=>i.kind==="char"),wd=items.filter(i=>i.kind==="word"),st=items.filter(i=>i.kind==="sent");
+  let h=`<input class="search" id="q" type="search" placeholder="Search (character, pinyin, English)" value="${esc(query)}">
+  <div class="seg" style="position:static">${[["all","All"],["char","Characters"],["word","Words"],["sent","Sentences"]].map(([k,t])=>`<button data-f="${k}" class="${filt===k?"on":""}">${t}</button>`).join("")}</div>`;
+  if((filt==="all"||filt==="char")&&ch.length)h+=`<h2>Characters (${ch.length})</h2><div class="grid">${ch.map(i=>`<button class="cc" data-det="${esc(i.id)}"><div class="tz">${i.zh}</div><div class="p">${esc(i.py)}</div><div class="e">${esc(i.en)}</div></button>`).join("")}</div>`;
+  const rows=a=>a.map(i=>`<div class="row"><div class="w"><div class="z">${i.zh}</div><div class="p">${esc(i.py)}</div><div class="e">${esc(i.en)}</div></div>${S.err[i.id]?'<span class="cnt">to review</span>':""}${spkBtn(i.zh)}</div>`).join("");
+  if((filt==="all"||filt==="word")&&wd.length)h+=`<h2>Words and combinations (${wd.length})</h2>${rows(wd)}`;
+  if((filt==="all"||filt==="sent")&&st.length)h+=`<h2>Sentences (${st.length})</h2>${rows(st)}`;
+  if(L.dialogue&&(filt==="all"||filt==="sent")&&!query){const D=L.dialogue;
+    h+=`<h2>${esc(D.title)}</h2><p class="note">${esc(D.note)}</p>`+D.lines.map(l=>{const z=l[1].split(" ").map(t=>PUNCT[t]||t).join("");return `<div class="dlg"><span class="who">${l[0]}</span><div class="w" style="flex:1"><div class="zh" style="font-size:20px">${z}</div><div class="p" style="color:var(--red);font-size:14px">${esc(l[2])}</div><div class="note">${esc(l[3])}</div></div>${spkBtn(z)}</div>`}).join("")}
+  if(!items.length)h+=`<p class="empty">No results.</p>`;
+  return h;
+}
+function vGram(L){
+  return L.grammar.map((g,n)=>`<div class="gcard"><h3>${n+1}. ${esc(g.t)}</h3><p>${g.p}</p>${g.ex.map(e=>`<div class="ex"><div style="flex:1"><div class="z">${fw(e[0])}</div><div class="p" style="color:var(--red);font-size:14px">${esc(e[1])}</div><div class="note">${esc(e[2])}</div></div>${spkBtn(e[0].split("→").pop())}</div>`).join("")}</div>`).join("")+
+  `<button class="primary" data-start="build" data-l="${L.id}">Practice building sentences</button>`;
+}
+function vTrain(L){
+  const p=progress(L.id);
+  return `<div class="stat"><div><b>${p}%</b><span>mastered</span></div><div><b>${BYL[L.id].filter(i=>S.err[i.id]).length}</b><span>to review</span></div></div>
+  <div class="tiles">
+   <button class="tbtn" data-start="zh2en" data-l="${L.id}"><b class="zh">中 → EN</b><span>Recognize: translate Chinese into English</span></button>
+   <button class="tbtn" data-start="en2zh" data-l="${L.id}"><b class="zh">EN → 中</b><span>Produce: find the Chinese</span></button>
+   <button class="tbtn" data-start="tone" data-l="${L.id}"><b>Tones</b><span>Pick the right pinyin</span></button>
+   <button class="tbtn" data-start="build" data-l="${L.id}"><b>Sentences</b><span>Put the words in order</span></button>
+   <button class="tbtn wide" data-start="write" data-l="${L.id}" style="background:var(--red);border-color:var(--red)"><b class="zh">EN → 寫</b><span>Write: type the Chinese with your keyboard</span></button>
+   <button class="tbtn wide" data-start="mix" data-l="${L.id}"><b>Mix · 10 questions</b><span>All exercise types</span></button>
+  </div>
+  <button class="ghost" data-exam="${L.id}">Take the lesson test (20 questions)</button>`;
+}
+function vErrors(){
+  const ids=Object.keys(S.err).filter(k=>ITEMS[k]).sort((a,b)=>S.err[b].n-S.err[a].n);
+  let h=`<h1>My mistakes</h1><p class="sub">Everything you get wrong lands here. An item disappears after 2 correct answers in a row.</p>`;
+  if(!ids.length)return h+`<div class="empty"><span class="zh">好</span>No mistakes to review yet. Do an exercise or a test!</div>`;
+  h+=`<button class="primary" data-start="errors">Review my mistakes (${ids.length})</button><h2>To review</h2>`;
+  h+=ids.map(k=>{const i=ITEMS[k];return `<div class="row"><div class="w"><div class="z">${i.zh}</div><div class="p">${esc(i.py)}</div><div class="e">${esc(i.en)} · Lesson ${lesson(i.L).code}</div></div><span class="cnt">×${S.err[k].n}</span>${spkBtn(i.zh)}<button class="x" data-rm="${esc(k)}" aria-label="Remove">×</button></div>`}).join("");
+  h+=`<button class="ghost" id="reset">Reset all my progress</button><div id="resetC" class="hide gcard"><p>Erase all mistakes, progress and test results?</p><button class="primary" id="resetY">Yes, erase everything</button><button class="ghost" id="resetN">Cancel</button></div>`;
+  return h;
+}
+function vTests(){
+  const card=(id,title,sub)=>{const t=S.tests.filter(x=>x.l===id);const best=t.length?Math.max(...t.map(x=>Math.round(100*x.s/x.n))):null;
+    return `<div class="gcard"><h3>${esc(title)}</h3><p class="note">${esc(sub)}</p>
+    <div class="stat"><div><b>${best===null?"—":best+"%"}</b><span>best score</span></div><div><b>${t.length}</b><span>test${t.length===1?"":"s"} taken</span></div></div>
+    <button class="primary" data-exam="${id}">Start</button></div>`};
+  let h=`<h1>Tests</h1><p class="sub">20 questions, no pinyin and no instant feedback. Your score and the corrections appear at the end, and your mistakes go to “My mistakes”.</p>`;
+  h+=LESSONS.map(L=>card(L.id,`Lesson ${L.code} · ${L.title}`,L.sub)).join("")+card("all","Full test","All lessons mixed");
+  if(S.tests.length){h+=`<h2>History</h2>`+S.tests.slice().reverse().slice(0,15).map(t=>`<div class="row"><div class="w"><b>${t.l==="all"?"Full test":"Lesson "+lesson(t.l).code}</b><div class="e">${new Date(t.d).toLocaleDateString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div></div><span class="cnt" style="${t.s/t.n>=.8?"background:var(--okbg);color:var(--ok)":""}">${t.s}/${t.n}</span></div>`).join("")}
+  return h;
+}
+
+/* ---------- character detail ---------- */
+function detail(id){const i=ITEMS[id];const sh=$("#sheet");
+  sh.innerHTML=`<div role="dialog" aria-modal="true"><div style="text-align:center"><div class="tz">${i.zh}</div><div style="color:var(--red);font-size:20px">${esc(i.py)}</div><div style="font-size:18px;font-weight:600">${esc(i.en)}</div>
+  <div style="display:flex;justify-content:center;margin:10px 0">${spkBtn(i.zh)}</div></div>
+  ${i.ex&&i.ex.length?`<h2>Combinations</h2>`+i.ex.map(e=>`<div class="row"><div class="w"><div class="z">${e[0]}</div><div class="p">${esc(e[1])}</div><div class="e">${esc(e[2])}</div></div>${spkBtn(e[0])}</div>`).join(""):""}
+  <button class="ghost" data-close>Close</button></div>`;
+  sh.classList.remove("hide");speak(i.zh)}
+
+/* ---------- exercises ---------- */
+const TONES={a:"āáǎà",e:"ēéěè",i:"īíǐì",o:"ōóǒò",u:"ūúǔù",ü:"ǖǘǚǜ"};
+const BASE={};for(const v in TONES)[...TONES[v]].forEach((c,n)=>BASE[c]=[v,n]);
+function toneVariants(py){const chars=[...py],pos=chars.map((c,i)=>BASE[c]?i:-1).filter(i=>i>=0);const out=new Set();
+  for(let tries=0;tries<40&&out.size<6;tries++){const c=chars.slice();const k=1+Math.floor(Math.random()*Math.min(2,pos.length));
+    for(const p of shuffle(pos).slice(0,k)){const [v,n]=BASE[c[p]];let m;do{m=Math.floor(Math.random()*5)}while(m===n);c[p]=m===4?v:TONES[v][m]}
+    const s=c.join("");if(s!==py)out.add(s)}return [...out]}
+const MODES={write:"Write it in Chinese",zh2en:"What does it mean?",en2zh:"How do you say it in Chinese?",tone:"Which pinyin is right?",build:"Put the words in order"};
+function canMode(it,m){if(m==="write")return [...it.zh].length<=14;if(m==="build")return it.kind==="sent"&&it.tk.filter(t=>!isP(t)).length>=3;
+  if(m==="tone")return it.kind!=="sent"&&/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(it.py)&&!it.py.includes("/");return true}
+function distract(it,field,pool){const same=pool.filter(o=>o.id!==it.id&&o[field]!==it[field]&&o.en!==it.en&&o.zh!==it.zh);
+  const pref=same.filter(o=>o.kind===it.kind);let src=shuffle(pref.length>=3?pref:same);
+  const out=[];const seen=new Set([it[field]]);for(const o of src){if(seen.has(o[field]))continue;seen.add(o[field]);out.push(o[field]);if(out.length===3)break}
+  if(out.length<3)for(const o of shuffle(ALL)){if(seen.has(o[field])||o.en===it.en)continue;seen.add(o[field]);out.push(o[field]);if(out.length===3)break}
+  return out}
+function makeQ(it,mode,pool){const q={it,mode};
+  if(mode==="zh2en")q.opts=shuffle([it.en,...distract(it,"en",pool)]),q.ans=it.en;
+  else if(mode==="write")q.ans=it.zh;
+  else if(mode==="en2zh")q.opts=shuffle([it.zh,...distract(it,"zh",pool)]),q.ans=it.zh;
+  else if(mode==="tone"){const v=toneVariants(it.py);const others=shuffle(pool.filter(o=>o.py!==it.py&&o.kind===it.kind&&[...o.zh].length===[...it.zh].length).map(o=>o.py));
+    const d=[...new Set([...v.slice(0,2),...others,...v.slice(2)])].filter(x=>x!==it.py).slice(0,3);q.opts=shuffle([it.py,...d]);q.ans=it.py}
+  else{q.words=it.tk.filter(t=>!isP(t));q.tail=it.tk.filter(isP).map(t=>PUNCT[t]).pop()||"";q.pool=shuffle(q.words.map((w,i)=>({w,i})));
+    if(q.pool.map(x=>x.w).join("")===q.words.join(""))q.pool.reverse();q.picked=[];q.ans=q.words.join(" ")}
+  return q}
+function buildSession(kind,lid,n){
+  const pool=lid==="all"||!lid?ALL:BYL[lid];let src,modes;
+  if(kind==="errors"){src=Object.keys(S.err).filter(k=>ITEMS[k]).map(k=>ITEMS[k]);modes=["zh2en","en2zh","tone","build"]}
+  else{src=pool;modes=kind==="mix"||kind==="exam"?["zh2en","en2zh","tone","build","zh2en","en2zh"]:[kind]}
+  let cands=shuffle(src.filter(it=>modes.some(m=>canMode(it,m))));
+  // favour items not yet known
+  if(kind!=="errors")cands.sort((a,b)=>(S.known[a.id]?1:0)-(S.known[b.id]?1:0)+(Math.random()-.5)*.8);
+  const qs=cands.slice(0,n).map(it=>{const ok=shuffle(modes).filter(m=>canMode(it,m));return makeQ(it,ok[0],pool)});
+  return qs}
+let Q=null;
+function start(kind,lid){
+  const exam=kind==="exam";const qs=buildSession(kind,lid,exam?20:kind==="errors"?Math.min(15,errCount()):10);
+  if(!qs.length)return;
+  const L=lid&&lid!=="all"?lesson(lid):null;
+  Q={kind,lid,exam,qs,i:0,res:[],requeued:new Set(),title:exam?(L?`Test · Lesson ${L.code}`:"Full test"):kind==="errors"?"Mistake review":(L?`Lesson ${L.code}`:"")};
+  $("#quiz").classList.remove("hide");document.body.style.overflow="hidden";drawQ()}
+function closeQ(){Q=null;$("#quiz").classList.add("hide");$("#quiz").innerHTML="";document.body.style.overflow="";render()}
+function drawQ(fb){
+  const q=Q.qs[Q.i],it=q.it,showPy=S.pinyin&&!Q.exam;
+  const pct=Math.round(100*Q.i/Q.qs.length);
+  let h=`<div class="qin"><div class="qtop"><button class="x" data-quit aria-label="Quit">×</button><div class="bar"><i style="width:${pct}%"></i></div><span class="note">${Q.i+1}/${Q.qs.length}</span></div>
+  <div class="qtype">${esc(Q.title)} · ${MODES[q.mode]}</div>`;
+  const big=[...it.zh].length<=2?"big":"mid";
+  const pc=fb?"prompt still":"prompt";
+  if(q.mode==="zh2en")h+=`<div class="${pc}"><div class="${big}">${it.zh}</div>${showPy?`<div class="p">${esc(it.py)}</div>`:""}<div style="display:flex;justify-content:center;margin-top:8px">${spkBtn(it.zh)}</div></div>`;
+  else if(q.mode==="tone")h+=`<div class="${pc}"><div class="${big}">${it.zh}</div><div class="note">${esc(it.en)}</div></div>`;
+  else h+=`<div class="${pc}"><div class="en">${esc(it.en)}</div></div>`;
+  if(q.mode==="write"){
+    if(showPy)h=h.replace('<div class="en">'+esc(it.en)+'</div></div>','<div class="en">'+esc(it.en)+'</div><div class="p">'+esc(it.py)+'</div></div>');
+    h+=`<input class="search" id="wr" lang="zh-Hant-TW" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type in Chinese…" style="font-size:24px;text-align:center" value="${esc(q.given||"")}" ${fb?"disabled":""}>
+    <p class="note" style="text-align:center">“Chinese Traditional – Pinyin” keyboard: type <i>nihao</i>, then pick 你好. Punctuation and spaces are ignored.</p>`;
+    if(!fb)h+=`<button class="primary" id="checkw">Check</button><button class="ghost" id="skipw">I don't know</button>`;
+  }else if(q.mode==="build"){
+    h+=`<div class="slots" id="slots">${q.picked.map((p,k)=>`<button class="tile" data-unpick="${k}">${esc(q.pool[p].w)}</button>`).join("")}${q.picked.length===q.words.length?`<span class="zh" style="font-size:22px">${q.tail}</span>`:""}</div>
+    <div class="pool">${q.pool.map((t,k)=>`<button class="tile ${q.picked.includes(k)?"used":""}" data-pick="${k}" ${fb?"disabled":""}>${esc(t.w)}</button>`).join("")}</div>`;
+    if(!fb)h+=`<button class="primary" id="check" ${q.picked.length===q.words.length?"":"disabled style=\"opacity:.45\""}>Check</button>`;
+  }else{
+    const zhOpt=q.mode==="en2zh";
+    h+=`<div class="opts">${q.opts.map((o,k)=>{let c="opt"+(zhOpt?" zhopt":"");
+      if(fb){if(o===q.ans)c+=" good";else if(o===q.chosen)c+=" bad"}
+      let sub="";if(zhOpt&&showPy){const m=ALL.find(x=>x.zh===o);if(m)sub=`<small>${esc(m.py)}</small>`}
+      return `<button class="${c}" data-opt="${k}" ${fb?"disabled":""}>${esc(o)}${sub}</button>`}).join("")}</div>`;
+  }
+  if(fb){const ok=fb==="good";
+    h+=`<div class="fb ${fb}"><h4>${ok?"對！ Correct":"Not quite…"}</h4>
+    <div class="ans"><div style="flex:1"><div class="z">${it.zh}</div><div style="color:var(--red)">${esc(it.py)}</div><div>${esc(it.en)}</div></div>${spkBtn(it.zh)}</div>
+    <button class="primary" id="next">Continue</button></div>`}
+  h+=`</div>`;$("#quiz").innerHTML=h;
+  if(fb){speak(it.zh);const n=$("#next");n&&n.focus()}
+  else if(q.mode==="write"){const w=$("#wr");w&&w.focus()}
+}
+function answer(ok,given){
+  const q=Q.qs[Q.i];record(q.it,ok);Q.res.push({q,ok,given});save();
+  if(Q.exam){nextQ();return}
+  if(!ok&&!Q.requeued.has(q.it.id)){Q.requeued.add(q.it.id);const m=q.mode;Q.qs.push(makeQ(q.it,m,Q.lid&&Q.lid!=="all"?BYL[Q.lid]:ALL))}
+  drawQ(ok?"good":"bad")}
+function nextQ(){Q.i++;if(Q.i>=Q.qs.length)finish();else drawQ()}
+function finish(){
+  const first=new Map();for(const r of Q.res)if(!first.has(r.q.it.id+r.q.mode))first.set(r.q.it.id+r.q.mode,r);
+  const res=[...first.values()];const s=res.filter(r=>r.ok).length,n=res.length;
+  if(Q.exam){S.tests.push({l:Q.lid||"all",s,n,d:Date.now()});if(S.tests.length>200)S.tests=S.tests.slice(-200);save()}
+  const pct=Math.round(100*s/n);const seal=pct>=90?"優":pct>=70?"好":pct>=50?"可":"加油";
+  const wrong=res.filter(r=>!r.ok);
+  let h=`<div class="qin"><div class="qtop"><button class="x" data-quit aria-label="Close">×</button><div class="bar"><i style="width:100%"></i></div></div>
+  <div class="score"><div class="zh">${seal}</div><b>${s} / ${n}</b><span class="note">${pct}% correct${seal==="加油"?" · 加油 jiāyóu = keep going!":""}</span></div>`;
+  if(wrong.length){h+=`<h2>${Q.exam?"Corrections":"To review"} (${wrong.length})</h2>`+wrong.map(r=>{const it=r.q.it;
+    return `<div class="row"><div class="w"><div class="z">${it.zh}</div><div class="p">${esc(it.py)}</div><div class="e">${esc(it.en)}</div>${r.given?`<div class="note" style="color:var(--red)">Your answer: ${esc(r.given)}</div>`:""}</div>${spkBtn(it.zh)}</div>`}).join("")+
+    `<p class="note">These items were added to “My mistakes”.</p>`}
+  else h+=`<p class="empty">Perfect score, well done!</p>`;
+  h+=`<button class="primary" id="again">Try again</button><button class="ghost" data-quit>Finish</button></div>`;
+  $("#quiz").innerHTML=h;Q.done=true;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button,[data-close]");if(!t)return;
+  if(t.dataset.say!==undefined){e.stopPropagation();speak(t.dataset.say);return}
+  if(t.dataset.tab){go(t.dataset.tab);return}
+  if(t.dataset.go){go(t.dataset.go);return}
+  if(t.dataset.sub){sub=t.dataset.sub;render();return}
+  if(t.dataset.f){filt=t.dataset.f;render();return}
+  if(t.dataset.det){detail(t.dataset.det);return}
+  if(t.dataset.close!==undefined){$("#sheet").classList.add("hide");return}
+  if(t.id==="pyT"){S.pinyin=!S.pinyin;save();render();return}
+  if(t.dataset.start){start(t.dataset.start,t.dataset.l);return}
+  if(t.dataset.exam){start("exam",t.dataset.exam==="all"?null:t.dataset.exam);return}
+  if(t.dataset.rm){delete S.err[t.dataset.rm];save();render();return}
+  if(t.id==="reset"){$("#resetC").classList.remove("hide");return}
+  if(t.id==="resetN"){$("#resetC").classList.add("hide");return}
+  if(t.id==="resetY"){S={pinyin:S.pinyin,known:{},err:{},tests:[],t:0};save();render();return}
+  if(!Q)return;
+  if(t.dataset.quit!==undefined){closeQ();return}
+  if(t.id==="again"){const k=Q.exam?"exam":Q.kind,l=Q.lid;closeQ();start(k,l);return}
+  if(t.id==="next"){nextQ();return}
+  const q=Q.qs[Q.i];if(!q||Q.done)return;
+  if(t.dataset.opt!==undefined){const o=q.opts[+t.dataset.opt];q.chosen=o;answer(o===q.ans,o);return}
+  if(t.dataset.pick!==undefined){const k=+t.dataset.pick;if(!q.picked.includes(k)){q.picked.push(k);drawQ()}return}
+  if(t.dataset.unpick!==undefined){q.picked.splice(+t.dataset.unpick,1);drawQ();return}
+  if(t.id==="checkw"||t.id==="skipw"){const g=t.id==="skipw"?"":($("#wr").value||"");q.given=g;answer(t.id==="checkw"&&norm(g)===norm(q.ans)&&norm(g)!=="",g||"—");return}
+  if(t.id==="check"){const g=q.picked.map(k=>q.pool[k].w).join(" ");answer(g===q.ans,g.replace(/ /g,""));return}
+});
+$("#sheet").addEventListener("click",e=>{if(e.target.id==="sheet")$("#sheet").classList.add("hide")});
+document.addEventListener("input",e=>{if(e.target.id==="q"){query=e.target.value.trim();const pos=e.target.selectionStart;render();const q=$("#q");if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(_){}}}});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="wr"){e.preventDefault();const b=$("#checkw");b&&b.click();return}if(e.key==="Escape"){if(!$("#sheet").classList.contains("hide"))$("#sheet").classList.add("hide");else if(Q)closeQ()}});
+window.addEventListener("hashchange",route);
+route();
+initSync();
+}
+</script>
+</body>
+</html>
