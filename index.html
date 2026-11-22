@@ -98,6 +98,15 @@ nav button.on{color:var(--red)}
 .sheet>div{background:var(--bg);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:18px 16px 28px;max-height:86vh;overflow-y:auto}
 .sheet .tz{width:120px;height:120px;font-size:88px;line-height:120px}
 .hide{display:none!important}
+.mgrid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:10px}.mgrid>div{display:grid;gap:10px;align-content:start}
+.mt{border:2px solid var(--line);background:var(--bg);border-radius:12px;padding:10px;min-height:56px;font-size:15px;line-height:1.25}.mt.zhopt{font:20px/1.3 var(--zh)}
+.mt.sel{border-color:var(--ink);background:var(--card)}.mt.good{border-color:var(--ok);background:var(--okbg);opacity:.7}.mt.bad{border-color:var(--red);background:var(--redbg)}
+.cells{display:inline-flex}.cell{width:84px;height:84px;display:grid;place-items:center;font:56px/1 var(--zh);border:2px solid var(--ink);margin-left:-2px;background:
+ linear-gradient(var(--redbg),var(--redbg)) center/1px 100% no-repeat,linear-gradient(var(--redbg),var(--redbg)) center/100% 1px no-repeat}
+.cell.empty{color:var(--mute);font-size:36px}.okc{color:var(--ok)!important}.badc{color:var(--red)!important}
+.cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.cgrid .opt{text-align:center}
+.blank{display:inline-block;min-width:2.2em;border-bottom:3px solid var(--red);color:var(--red);padding:0 4px}
+.pcard{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px}.pcard .seal{flex:none;border-radius:10px;background:var(--red);color:#fff;display:grid;place-items:center;font-family:var(--zh)}
 .dlg{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.dlg .who{flex:none;width:28px;height:28px;border-radius:50%;background:var(--redbg);color:var(--red);display:grid;place-items:center;font-weight:700;font-size:13px}
 .note{font-size:13px;color:var(--mute)}
 .sync{font-size:12px;color:var(--mute);text-align:center;margin-top:24px}
@@ -344,6 +353,7 @@ const LESSONS = [
     ["四川人","Sìchuānrén","person from Sichuan"],["台北","Táiběi","Taipei"],
     ["記者","jìzhě","journalist"],["職員","zhíyuán","employee"],["會計","kuàijì","accountant"],["護士","hùshi","nurse"],
     ["工程師","gōngchéngshī","engineer"],["祕書","mìshū","secretary"],["軍人","jūnrén","soldier"],["經理","jīnglǐ","manager"],["運動員","yùndòngyuán","athlete"],
+    ["總統","zǒngtǒng","president (of a country)"],["主席","zhǔxí","chairman"],["畫家","huàjiā","painter"],["作家","zuòjiā","writer"],
     ["英語","Yīngyǔ","English (language)"],["德語","Déyǔ","German (language)"],["西班牙語","Xībānyáyǔ","Spanish (language)"],
     ["義大利語","Yìdàlìyǔ","Italian (language)"],["日語","Rìyǔ","Japanese (language)"],["法語","Fǎyǔ","French (language)"]
   ],
@@ -388,6 +398,65 @@ const LESSONS = [
     ["她 是 台灣人 , 住在 台北 。","Tā shì Táiwānrén, zhùzài Táiběi.","She's Taiwanese, she lives in Taipei."],
     ["我 叫 馬京生 , 是 中國人 。","Wǒ jiào Mǎ Jīngshēng, shì Zhōngguórén.","My name is Ma Jingsheng, I'm Chinese."]
   ],
+  book: {
+    // Fill in the blank: [sentence with _, answer, "distractor|distractor|distractor", pinyin, english]
+    blank: [
+      ["我 姓 _ , 叫 王大山 。","王","白|馬|李","Wǒ xìng Wáng, jiào Wáng Dàshān.","My surname is Wang, my name is Wang Dashan."],
+      ["你 叫 _ 名字 ?","什麼","哪|誰|怎麼樣","Nǐ jiào shénme míngzi?","What's your name?"],
+      ["你 是 _ 國人 ?","哪","什麼|誰|嗎","Nǐ shì nǎ guó rén?","What nationality are you?"],
+      ["你 是 中國人 _ ?","嗎","呢|的|都","Nǐ shì Zhōngguórén ma?","Are you Chinese?"],
+      ["我 是 法國人 , 你 _ ?","呢","嗎|也|都","Wǒ shì Fǎguórén, nǐ ne?","I'm French, and you?"],
+      ["這 是 我 _ 朋友 。","的","嗎|呢|也","Zhè shì wǒ de péngyou.","This is my friend."],
+      ["他們 _ 是 新 同學 。","都","的|嗎|會","Tāmen dōu shì xīn tóngxué.","They are all new classmates."],
+      ["我 會 說 英語 , _ 會 說 日語 。","也","都|的|呢","Wǒ huì shuō Yīngyǔ, yě huì shuō Rìyǔ.","I can speak English, and Japanese too."],
+      ["我 _ 巴黎 。","住在","是|叫|姓","Wǒ zhùzài Bālí.","I live in Paris."],
+      ["我 家 _ 北京 。","在","是|叫|會","Wǒ jiā zài Běijīng.","My home is in Beijing."],
+      ["你 _ 說 漢語 嗎 ?","會","在|是|姓","Nǐ huì shuō Hànyǔ ma?","Can you speak Chinese?"],
+      ["_ 是 你 的 老師 ?","誰","什麼|哪|嗎","Shéi shì nǐ de lǎoshī?","Who is your teacher?"],
+      ["北京 _ ?","怎麼樣","什麼|誰|哪","Běijīng zěnmeyàng?","What is Beijing like?"],
+      ["您 _ 姓 ?","貴","好|新|多","Nín guìxìng?","What is your surname? (polite)"],
+      ["我 不 _ 中國人 。","是","會|在|住","Wǒ bú shì Zhōngguórén.","I'm not Chinese."],
+      ["我 住 十五 _ 。","區","國|家|人","Wǒ zhù shíwǔ qū.","I live in the 15th district."]
+    ],
+    // True or false about the sample dialogue: [statement, pinyin, english, true?]
+    tf: [
+      ["白小梅 是 法國人 。","Bái Xiǎoméi shì Fǎguórén.","Bai Xiaomei is French.",true],
+      ["王大山 是 法國人 。","Wáng Dàshān shì Fǎguórén.","Wang Dashan is French.",false],
+      ["王大山 住在 北京 。","Wáng Dàshān zhùzài Běijīng.","Wang Dashan lives in Beijing.",true],
+      ["白小梅 的 家 在 北京 。","Bái Xiǎoméi de jiā zài Běijīng.","Bai Xiaomei's home is in Beijing.",false],
+      ["白小梅 在 大學 學習 漢語 。","Bái Xiǎoméi zài dàxué xuéxí Hànyǔ.","Bai Xiaomei studies Chinese at university.",true],
+      ["白小梅 不 會 說 漢語 。","Bái Xiǎoméi bú huì shuō Hànyǔ.","Bai Xiaomei can't speak Chinese.",false],
+      ["王大山 姓 王 。","Wáng Dàshān xìng Wáng.","Wang Dashan's surname is Wang.",true],
+      ["北京 人 很 少 。","Běijīng rén hěn shǎo.","There are few people in Beijing.",false]
+    ],
+    // Yes / no answers (tables of ex. 2–6): [question, q pinyin, q english, yes, yes pinyin, yes english, no, no pinyin, no english]
+    qa: [
+      ["你 是 中國人 嗎 ?","Nǐ shì Zhōngguórén ma?","Are you Chinese?","是 , 我 是 中國人 。","Shì, wǒ shì Zhōngguórén.","Yes, I'm Chinese.","不是 , 我 是 法國人 。","Búshì, wǒ shì Fǎguórén.","No, I'm French."],
+      ["你 是 哪國人 ?","Nǐ shì nǎ guó rén?","What nationality are you?","我 是 法國人 。","Wǒ shì Fǎguórén.","I'm French.","","",""],
+      ["你 是 巴黎人 嗎 ?","Nǐ shì Bālírén ma?","Are you from Paris?","是 , 我 是 巴黎人 。","Shì, wǒ shì Bālírén.","Yes, I'm from Paris.","不是 , 我 是 馬賽人 。","Búshì, wǒ shì Mǎsàirén.","No, I'm from Marseille."],
+      ["你 是 哪兒 的 人 ?","Nǐ shì nǎr de rén?","Where are you from?","我 是 巴黎人 。","Wǒ shì Bālírén.","I'm from Paris.","","",""],
+      ["你 是 學生 嗎 ?","Nǐ shì xuésheng ma?","Are you a student?","是 , 我 是 學生 。","Shì, wǒ shì xuésheng.","Yes, I'm a student.","不是 , 我 是 老師 。","Búshì, wǒ shì lǎoshī.","No, I'm a teacher."],
+      ["你 做 什麼 工作 ?","Nǐ zuò shénme gōngzuò?","What do you do (for work)?","我 是 醫生 。","Wǒ shì yīshēng.","I'm a doctor.","","",""],
+      ["你 會 說 漢語 嗎 ?","Nǐ huì shuō Hànyǔ ma?","Can you speak Chinese?","會 , 我 會 說 漢語 。","Huì, wǒ huì shuō Hànyǔ.","Yes, I can speak Chinese.","我 不 會 說 漢語 , 我 會 說 法語 。","Wǒ bú huì shuō Hànyǔ, wǒ huì shuō Fǎyǔ.","I can't speak Chinese, I speak French."],
+      ["你 會 說 什麼 外語 ?","Nǐ huì shuō shénme wàiyǔ?","What foreign languages can you speak?","我 會 說 英語 。","Wǒ huì shuō Yīngyǔ.","I can speak English.","","",""],
+      ["你 住在 巴黎 嗎 ?","Nǐ zhùzài Bālí ma?","Do you live in Paris?","對 , 我 住在 巴黎 。","Duì, wǒ zhùzài Bālí.","Yes, I live in Paris.","不 , 我 不 住在 巴黎 , 我 住在 馬賽 。","Bù, wǒ bú zhùzài Bālí, wǒ zhùzài Mǎsài.","No, I don't live in Paris, I live in Marseille."],
+      ["你 住 哪兒 ?","Nǐ zhù nǎr?","Where do you live?","我 住 十五 區 。","Wǒ zhù shíwǔ qū.","I live in the 15th district.","","",""],
+      ["你 家 在 哪兒 ?","Nǐ jiā zài nǎr?","Where is your home?","我 家 在 巴黎 。","Wǒ jiā zài Bālí.","My home is in Paris.","","",""]
+    ],
+    // Match questions and answers (ex. 8): [question, answer]
+    qmatch: [
+      ["你姓什麼？","我姓王。"],["你叫什麼名字？","我叫王大山。"],["你會說英語嗎？","不，我會說法語。"],
+      ["你是哪國人？","我是中國人。"],["你住哪兒？","我住在北京。"],["你是中文老師嗎？","是，我是中文老師。"],
+      ["你是法國人嗎？","不，我是中國人。"],["你家在哪兒？","我家在巴黎。"],["你做什麼工作？","我是工程師。"],["北京怎麼樣？","很好，人很多。"]
+    ],
+    // Introduce these people (ex. 9)
+    people: [
+      {zh:"戴高樂",py:"Dàigāolè",en:"Charles de Gaulle",role:"French president",nat:"法國人",natPy:"Fǎguórén",job:"總統",jobPy:"zǒngtǒng",fr:true},
+      {zh:"毛澤東",py:"Máo Zédōng",en:"Mao Zedong",role:"Chinese chairman",nat:"中國人",natPy:"Zhōngguórén",job:"主席",jobPy:"zhǔxí",fr:false},
+      {zh:"達文西",py:"Dáwénxī",en:"Leonardo da Vinci",role:"Italian painter",nat:"義大利人",natPy:"Yìdàlìrén",job:"畫家",jobPy:"huàjiā",fr:false},
+      {zh:"魯迅",py:"Lǔ Xùn",en:"Lu Xun",role:"Chinese writer",nat:"中國人",natPy:"Zhōngguórén",job:"作家",jobPy:"zuòjiā",fr:false}
+    ]
+  },
   dialogue: {
     title: "Sample dialogue",
     note: "Written from the lesson vocabulary (the textbook dialogues are audio only).",
@@ -552,8 +621,8 @@ function vLessons(){
 function vLesson(){
   const L=lesson(cur);
   let h=`<button class="back" data-go="lecons">‹ Lessons</button><h1>Lesson ${L.code} · ${esc(L.title)}</h1><p class="sub">${esc(L.sub)}</p>
-  <div class="seg">${[["vocab","Vocabulary"],["gram","Grammar"],["train","Practice"]].map(([k,t])=>`<button data-sub="${k}" class="${sub===k?"on":""}">${t}</button>`).join("")}</div>`;
-  if(sub==="vocab")h+=vVocab(L);else if(sub==="gram")h+=vGram(L);else h+=vTrain(L);
+  <div class="seg">${[["vocab","Vocabulary"],["gram","Grammar"],["train","Practice"],["book","Workbook"]].map(([k,t])=>`<button data-sub="${k}" class="${sub===k?"on":""}">${t}</button>`).join("")}</div>`;
+  if(sub==="vocab")h+=vVocab(L);else if(sub==="gram")h+=vGram(L);else if(sub==="book")h+=vBook(L);else h+=vTrain(L);
   return h;
 }
 function match(i){if(!query)return true;const q=query.toLowerCase();return i.zh.includes(query)||i.en.toLowerCase().includes(q)||i.py.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").includes(q.normalize("NFD").replace(/[̀-ͯ]/g,""))}
@@ -575,6 +644,7 @@ function vGram(L){
   return L.grammar.map((g,n)=>`<div class="gcard"><h3>${n+1}. ${esc(g.t)}</h3><p>${g.p}</p>${g.ex.map(e=>`<div class="ex"><div style="flex:1"><div class="z">${fw(e[0])}</div><div class="p" style="color:var(--red);font-size:14px">${esc(e[1])}</div><div class="note">${esc(e[2])}</div></div>${spkBtn(e[0].split("→").pop())}</div>`).join("")}</div>`).join("")+
   `<button class="primary" data-start="build" data-l="${L.id}">Practice building sentences</button>`;
 }
+function vBook(L){return `<p class="sub" style="margin-top:4px">Exercises in the same formats as your textbook.</p>`+bookList(L.id).map((x,n)=>`<button class="lcard" data-start="${x.k}" data-l="${L.id}"><span class="seal" style="font-size:22px;font-family:Inter,sans-serif">${n+1}</span><div style="flex:1"><b>${esc(x.t)}</b><span>${esc(x.d)}</span></div></button>`).join("")}
 function vTrain(L){
   const p=progress(L.id);
   return `<div class="stat"><div><b>${p}%</b><span>mastered</span></div><div><b>${BYL[L.id].filter(i=>S.err[i.id]).length}</b><span>to review</span></div></div>
@@ -684,15 +754,169 @@ function buildSession(kind,lid,n){
   if(kind!=="errors")cands.sort((a,b)=>(S.known[a.id]?1:0)-(S.known[b.id]?1:0)+(Math.random()-.5)*.8);
   const qs=cands.slice(0,n).map(it=>{const ok=shuffle(modes).filter(m=>canMode(it,m));return makeQ(it,ok[0],pool)});
   return qs}
+/* ---------- workbook: exercises in the textbook's formats ---------- */
+let UID=0;
+const BKT={match:"Match the words",qmatch:"Match questions and answers",en:"Translate into English",second:"Complete the word",num:"Numbers and months",combo:"Find the combinations",listen:"Listen: which pinyin?",blank:"Fill in the blank",tf:"True or false?",qa:"Answer the question",person:"Introduce this person"};
+Object.assign(MODES,BKT);
+const tk2zh=s=>s.split(" ").map(t=>PUNCT[t]||t).join("");
+function synth(lid,zh,py,en,tk){const id="x:"+zh;if(!ITEMS[id])ITEMS[id]={id,zh,py,en,kind:"sent",L:lid,tk:tk||null};return ITEMS[id]}
+for(const L of LESSONS)if(L.book){const B=L.book;
+  (B.blank||[]).forEach(b=>synth(L.id,tk2zh(b[0].replace("_",b[1])),b[3],b[4],b[0].replace("_",b[1]).split(" ")));
+  (B.qa||[]).forEach(r=>{synth(L.id,tk2zh(r[3]),r[4],r[5],r[3].split(" "));if(r[6])synth(L.id,tk2zh(r[6]),r[7],r[8],r[6].split(" "))});}
+ALL=Object.values(ITEMS);
+/* English answer checking */
+const enNorm=s=>String(s).toLowerCase().replace(/\(.*?\)/g," ").replace(/[’']/g,"'").replace(/[^a-z0-9' -]/g," ").replace(/\b(a|an|the|to|be)\b/g," ").replace(/-/g," ").replace(/\s+/g," ").trim();
+function lev(a,b){const m=a.length,n=b.length;if(Math.abs(m-n)>2)return 9;let p=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+function enOK(input,en){const u=enNorm(input);if(!u)return false;
+  const keys=en.toLowerCase().replace(/\(.*?\)/g," ").split(/[;,/]| or /).map(enNorm).filter(Boolean);keys.push(enNorm(en));
+  return keys.some(k=>k===u||k.replace(/ /g,"")===u.replace(/ /g,"")||(k.length>4&&lev(k,u)<=1)||(k.length>9&&lev(k,u)<=2))}
+/* numbers */
+const DZ="〇一二三四五六七八九",DP=["","yī","èr","sān","sì","wǔ","liù","qī","bā","jiǔ"];
+const ONES=["","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"],TENS=["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+function numZh(n){const t=Math.floor(n/10),u=n%10;return (t>1?DZ[t]:"")+(t?"十":"")+(u?DZ[u]:"")}
+function numPyOf(n){const t=Math.floor(n/10),u=n%10;let s=(t>1?DP[t]:"")+(t?"shí":"");if(u)s+=(s&&/^[aeoāáǎàēéěèōóǒò]/.test(DP[u])?"'":"")+DP[u];return s}
+const numEn=n=>n<20?ONES[n]:TENS[Math.floor(n/10)]+(n%10?"-"+ONES[n%10]:"");
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+/* which exercises a lesson offers */
+function bookList(lid){const L=lesson(lid),p=BYL[lid]||[],B=L.book||{},out=[];
+  const w=p.filter(i=>i.kind!=="sent");
+  if(w.length>=5)out.push({k:"bk:match",t:BKT.match,d:"Link each Chinese word to its English meaning"});
+  if(B.qmatch)out.push({k:"bk:qmatch",t:BKT.qmatch,d:"Link each question to the right answer"});
+  if(w.length>=5)out.push({k:"bk:en",t:BKT.en,d:"Write the meaning in English"});
+  if(w.length>=5)out.push({k:"write",t:"Translate into Chinese",d:"Type the Chinese with your keyboard"});
+  if(secondPool(lid).length>=3)out.push({k:"bk:second",t:BKT.second,d:"The first character is given: find the second one"});
+  if(lid==="a"||lid==="b")out.push({k:"bk:num",t:BKT.num,d:lid==="a"?"Read and write numbers with 一 二 三 六 八 十":"Numbers 1–99 and the months of the year"});
+  if(lid==="b")out.push({k:"bk:combo",t:BKT.combo,d:"Which characters form a word with this one?"});
+  if(B.blank)out.push({k:"bk:blank",t:BKT.blank,d:"Pick the missing word"});
+  if(B.qa)out.push({k:"bk:qa",t:"Answer yes / no",d:"Build the affirmative or negative answer"});
+  if(B.tf)out.push({k:"bk:tf",t:BKT.tf,d:"About the sample dialogue (Vocabulary tab)"});
+  if(B.people)out.push({k:"bk:person",t:"Introduce these people",d:"Answer questions about famous people"});
+  if(canSpeak&&w.some(i=>canMode(i,"tone")))out.push({k:"bk:listen",t:"Listen and pick the tones",d:"Hear a word, choose the right pinyin"});
+  return out}
+function wordSet(){return new Set(ALL.filter(i=>i.kind!=="sent").map(i=>i.zh))}
+function secondPool(lid){return (BYL[lid]||[]).filter(i=>i.kind==="word"&&[...i.zh].length===2&&i.L!=="v")}
+function vPool(lid){return lid==="1"?["a","b","1"]:lid==="b"?["a","b"]:[lid]}
+function buildBook(k,lid){
+  const L=lesson(lid),p=BYL[lid]||[],B=L.book||{},W=wordSet();let qs=[];
+  const words=shuffle(p.filter(i=>i.kind!=="sent"));
+  if(k==="match"){const src=words.filter(i=>i.en.length<=34);const seenEn=new Set();const uniq=src.filter(i=>!seenEn.has(i.en)&&seenEn.add(i.en));
+    for(let b=0;b<3&&uniq.length>=4;b++){const ps=uniq.splice(0,5);qs.push({mode:"match",pairs:ps.map(it=>({it,l:it.zh,r:it.en})),zhR:false})}}
+  if(k==="qmatch"){const src=shuffle(B.qmatch);for(let b=0;b<2&&src.length>=3;b++){const ps=src.splice(0,5);qs.push({mode:"match",pairs:ps.map(x=>({it:null,l:x[0],r:x[1]})),zhR:true,ttl:BKT.qmatch})}}
+  if(k==="en")qs=words.filter(i=>i.en.length<=40).slice(0,10).map(it=>({mode:"en",it}));
+  if(k==="second"){const sp=shuffle(secondPool(lid));const seconds=[...new Set(sp.map(i=>[...i.zh][1]))];
+    qs=sp.slice(0,10).map(it=>{const [a,b]=[...it.zh];const d=shuffle(seconds.filter(c=>c!==b&&!W.has(a+c))).slice(0,3);return {mode:"second",it,first:a,ans:b,opts:shuffle([b,...d])}}).filter(q=>q.opts.length>=3)}
+  if(k==="num"){const ok=lid==="a"?[0,1,2,3,6,8]:[0,1,2,3,4,5,6,7,8,9];const ns=[];
+    for(let n=1;n<100;n++){const t=Math.floor(n/10),u=n%10;if(ok.includes(t)&&ok.includes(u))ns.push(n)}
+    qs=shuffle(ns).slice(0,lid==="b"?7:10).map((n,i)=>{const it=synth(lid,numZh(n),numPyOf(n),String(n)+" ("+numEn(n)+")");return {mode:"num",it,dir:i%2?"w2zh":"zh2d",n}});
+    if(lid==="b")shuffle([...Array(12).keys()]).slice(0,3).forEach(m=>{const zh=numZh(m+1)+"月";qs.push({mode:"num",it:synth(lid,zh,numPyOf(m+1)+"yuè",MONTHS[m]),dir:"month",n:m+1})});
+    qs=shuffle(qs)}
+  if(k==="combo"){const chars=[...new Set(vPool(lid).flatMap(l=>(BYL[l]||[]).filter(i=>i.kind==="char").map(i=>i.zh)))];
+    const two=[...W].filter(z=>[...z].length===2&&[...z].every(c=>chars.includes(c)));
+    for(const x of shuffle(chars)){if(qs.length>=8)break;
+      const after=two.filter(z=>z[0]===x).map(z=>z[1]),before=two.filter(z=>z[1]===x).map(z=>z[0]);
+      const pos=after.length>=2&&(before.length<2||Math.random()<.6)?"after":before.length>=2?"before":null;if(!pos)continue;
+      const good=shuffle(pos==="after"?after:before).slice(0,3);const bad=shuffle(chars.filter(c=>c!==x&&!W.has(pos==="after"?x+c:c+x))).slice(0,6-good.length);
+      qs.push({mode:"combo",x,pos,good,opts:shuffle([...good,...bad]),sel:[],norec:true})}}
+  if(k==="listen")qs=words.filter(i=>canMode(i,"tone")).slice(0,10).map(it=>Object.assign(makeQ(it,"tone",p),{mode:"listen"}));
+  if(k==="blank")qs=shuffle(B.blank).slice(0,10).map(b=>{const tk=b[0].split(" ");const it=ITEMS["x:"+tk2zh(b[0].replace("_",b[1]))];return {mode:"blank",it,tk,ans:b[1],opts:shuffle([b[1],...b[2].split("|")])}});
+  if(k==="tf")qs=shuffle(B.tf).map(r=>({mode:"tf",st:tk2zh(r[0]),py:r[1],en:r[2],ans:r[3],norec:true}));
+  if(k==="qa")qs=shuffle(B.qa).slice(0,8).map(r=>{const neg=r[6]&&Math.random()<.5;const at=neg?r[6]:r[3];const it=ITEMS["x:"+tk2zh(at)];
+    const q=makeQ(it,"build",p);return Object.assign(q,{mode:"qa",qz:tk2zh(r[0]),qpy:r[1],qen:r[2],neg,yesno:!!r[6]})});
+  if(k==="person"){const P=B.people,jobs=[...new Set(P.map(x=>x.job)),"老師"],nats=["法國人","中國人","義大利人","英國人","美國人"];
+    for(const x of shuffle(P)){const pool=[
+      ["他叫什麼？","Tā jiào shénme?","他叫"+x.zh+"。",P.filter(o=>o!==x).map(o=>"他叫"+o.zh+"。")],
+      ["他是哪國人？","Tā shì nǎ guó rén?","他是"+x.nat+"。",nats.filter(n=>n!==x.nat).map(n=>"他是"+n+"。")],
+      ["他說法語嗎？","Tā shuō Fǎyǔ ma?",x.fr?"他說法語。":"他不說法語。",[x.fr?"他不說法語。":"他說法語。","他是法語。","他不是法語。"]],
+      ["他做什麼工作？","Tā zuò shénme gōngzuò?","他是"+x.job+"。",jobs.filter(j=>j!==x.job).map(j=>"他是"+j+"。")],
+      ["他是老師嗎？","Tā shì lǎoshī ma?","不是，他是"+x.job+"。",["是，他是老師。","不是，他是學生。","不是，他是"+jobs.find(j=>j!==x.job&&j!=="老師")+"。"]]];
+      for(const r of shuffle(pool).slice(0,3))qs.push({mode:"person",who:x,qz:r[0],qpy:r[1],ans:r[2],opts:shuffle([r[2],...shuffle(r[3]).slice(0,3)]),norec:true})}}
+  qs.forEach(q=>{q.book=true;q.uid=++UID});return qs}
+/* drawing */
+function drawBook(q,fb){
+  const showPy=S.pinyin&&!Q.exam,pct=Math.round(100*Q.i/Q.qs.length),it=q.it;
+  let h=`<div class="qin"><div class="qtop"><button class="x" data-quit aria-label="Quit">×</button><div class="bar"><i style="width:${pct}%"></i></div><span class="note">${Q.i+1}/${Q.qs.length}</span></div>
+  <div class="qtype">${esc(Q.title)} · ${esc(q.ttl||BKT[q.mode])}</div>`;
+  const pc=fb?"prompt still":"prompt";const dis=fb?"disabled":"";
+  const optBtns=(zh)=>`<div class="opts">${q.opts.map((o,k)=>{let c="opt"+(zh?" zhopt":"");if(fb){if(o===q.ans)c+=" good";else if(o===q.chosen)c+=" bad"}return `<button class="${c}" data-bopt="${k}" ${dis}>${esc(o)}</button>`}).join("")}</div>`;
+  if(q.mode==="match"){
+    h+=`<p class="note" style="margin:6px 0 14px">Tap a word on the left, then its match on the right.</p><div class="mgrid">
+    <div>${q.lo.map(i=>{const d=q.done.includes(i);return `<button class="mt zhopt ${q.sel===i?"sel":""} ${d?"good":""}" data-ml="${i}" ${d||fb?"disabled":""}>${esc(q.pairs[i].l)}</button>`}).join("")}</div>
+    <div>${q.ro.map(i=>{const d=q.done.includes(i);return `<button class="mt ${q.zhR?"zhopt":""} ${d?"good":""} ${q.flash===i?"bad":""}" data-mr="${i}" ${d||fb?"disabled":""}>${esc(q.pairs[i].r)}</button>`}).join("")}</div></div>`;
+  }else if(q.mode==="en"){
+    h+=`<div class="${pc}"><div class="${[...it.zh].length<=2?"big":"mid"}">${esc(it.zh)}</div>${showPy?`<div class="p">${esc(it.py)}</div>`:""}<div style="display:flex;justify-content:center;margin-top:8px">${spkBtn(it.zh)}</div></div>
+    <input class="search" id="enin" lang="en" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Meaning in English…" style="text-align:center;font-size:20px" value="${esc(q.given||"")}" ${dis}>`;
+    if(!fb)h+=`<button class="primary" id="checken" style="margin-top:12px">Check</button><button class="ghost" id="skipen">I don't know</button>`;
+  }else if(q.mode==="second"){
+    h+=`<div class="${pc}"><div class="cells"><span class="cell">${esc(q.first)}</span><span class="cell ${fb?(fb==="good"?"okc":"badc"):"empty"}">${fb?esc(q.ans):"?"}</span></div><div class="en" style="margin-top:12px">${esc(it.en)}</div>${showPy?`<div class="p">${esc(it.py)}</div>`:""}</div>${optBtns(true)}`;
+  }else if(q.mode==="num"){
+    const lab=q.dir==="zh2d"?"Write this number in digits":q.dir==="month"?"Write this month in Chinese":"Write this number in Chinese";
+    const shown=q.dir==="zh2d"?`<div class="big">${esc(it.zh)}</div>${showPy?`<div class="p">${esc(it.py)}</div>`:""}`:q.dir==="month"?`<div class="en">${esc(it.en)}</div>`:`<div class="en">${esc(numEn(q.n))}</div><div class="note">${q.n}</div>`;
+    h+=`<p class="note" style="text-align:center;margin:10px 0 0">${lab}</p><div class="${pc}">${shown}</div>
+    <input class="search" id="nin" ${q.dir==="zh2d"?'inputmode="numeric" pattern="[0-9]*"':'lang="zh-Hant-TW"'} autocomplete="off" placeholder="${q.dir==="zh2d"?"e.g. 42":"Type in Chinese…"}" style="text-align:center;font-size:24px" value="${esc(q.given||"")}" ${dis}>`;
+    if(!fb)h+=`<button class="primary" id="checkn" style="margin-top:12px">Check</button><button class="ghost" id="skipn">I don't know</button>`;
+  }else if(q.mode==="combo"){
+    h+=`<p class="note" style="text-align:center;margin:10px 0 0">Tap every character that forms a word ${q.pos==="after"?"after":"before"} <b class="zh">${esc(q.x)}</b></p>
+    <div class="${pc}"><div class="cells">${q.pos==="after"?`<span class="cell">${esc(q.x)}</span><span class="cell empty">?</span>`:`<span class="cell empty">?</span><span class="cell">${esc(q.x)}</span>`}</div></div>
+    <div class="cgrid">${q.opts.map((c,k)=>{let cl="opt zhopt";if(fb){if(q.good.includes(c))cl+=" good";else if(q.sel.includes(k))cl+=" bad"}else if(q.sel.includes(k))cl+=" sel";return `<button class="${cl}" data-ctog="${k}" ${dis}>${esc(c)}</button>`}).join("")}</div>`;
+    if(!fb)h+=`<button class="primary" id="checkc" style="margin-top:14px">Check</button>`;
+  }else if(q.mode==="listen"){
+    h+=`<div class="${pc}"><button class="spk" id="replay" style="width:96px;height:96px;margin:0 auto" aria-label="Play again">${SPK.replace('<svg','<svg style="width:40px;height:40px"')}</button><p class="note">Tap to listen again</p></div>${optBtns(false)}`;
+  }else if(q.mode==="blank"){
+    const s=q.tk.map(t=>t==="_"?`<span class="blank ${fb?(fb==="good"?"okc":"badc"):""}">${fb?esc(q.ans):"＿＿"}</span>`:esc(PUNCT[t]||t)).join("");
+    h+=`<div class="${pc}"><div class="mid">${s}</div>${showPy&&fb?`<div class="p">${esc(it.py)}</div>`:""}<div class="note" style="margin-top:6px">${esc(it.en)}</div></div>${optBtns(true)}`;
+  }else if(q.mode==="tf"){
+    h+=`<div class="${pc}"><div class="mid">${esc(q.st)}</div>${showPy?`<div class="p">${esc(q.py)}</div>`:""}<div style="display:flex;justify-content:center;margin-top:8px">${spkBtn(q.st)}</div></div>
+    <div class="tiles">${[[true,"對 · True"],[false,"不對 · False"]].map(([v,l])=>{let c="opt";if(fb){if(v===q.ans)c+=" good";else if(v===q.chosen)c+=" bad"}return `<button class="${c}" style="text-align:center" data-tf="${v}" ${dis}>${l}</button>`}).join("")}</div>`;
+  }else if(q.mode==="qa"){
+    h+=`<div class="${pc}"><div class="mid">${esc(q.qz)}</div>${showPy?`<div class="p">${esc(q.qpy)}</div>`:""}<div class="note">${esc(q.qen)}</div>
+    ${q.yesno?`<div class="cnt" style="display:inline-block;margin-top:10px;${q.neg?"":"background:var(--okbg);color:var(--ok)"}">${q.neg?"Answer NO ✗":"Answer YES ✓"}</div>`:""}</div>
+    <div class="slots">${q.picked.map((pk,k)=>`<button class="tile" data-unpick="${k}" ${dis}>${esc(q.pool[pk].w)}</button>`).join("")}</div>
+    <div class="pool">${q.pool.map((t,k)=>`<button class="tile ${q.picked.includes(k)?"used":""}" data-pick="${k}" ${dis}>${esc(t.w)}</button>`).join("")}</div>`;
+    if(!fb)h+=`<button class="primary" id="check" ${q.picked.length===q.words.length?"":"disabled style=\"opacity:.45\""}>Check</button>`;
+  }else if(q.mode==="person"){
+    h+=`<div class="pcard"><span class="seal" style="width:52px;height:52px;font-size:24px">${esc([...q.who.zh][0])}</span><div><b>${esc(q.who.en)}</b><div class="note">${esc(q.who.role)} · ${esc(q.who.zh)} ${esc(q.who.py)}</div></div></div>
+    <div class="${pc}"><div class="mid">${esc(q.qz)}</div>${showPy?`<div class="p">${esc(q.qpy)}</div>`:""}</div>${optBtns(true)}`;
+  }
+  if(fb){const ok=fb==="good";let body="";
+    if(q.mode==="match")body=ok?"<p>Everything matched on the first try.</p>":`<p>${q.miss.length} mistake${q.miss.length>1?"s":""}.${q.zhR?"":" Those words were added to “My mistakes”."}</p>`;
+    else if(q.mode==="combo")body=`<div class="ans"><div style="flex:1">${q.good.map(c=>{const z=q.pos==="after"?q.x+c:c+q.x;const m=ALL.find(i=>i.zh===z);return `<div><span class="z">${esc(z)}</span> <span style="color:var(--red)">${m?esc(m.py):""}</span> <span class="note">${m?esc(m.en):""}</span></div>`}).join("")}</div></div>`;
+    else if(q.mode==="tf")body=`<p>${esc(q.en)} — <b>${q.ans?"true":"false"}</b>.</p>`;
+    else if(q.mode==="person")body=`<div class="ans"><div style="flex:1"><div class="z">${esc(q.ans)}</div></div>${spkBtn(q.ans)}</div>`;
+    else if(it)body=`<div class="ans"><div style="flex:1"><div class="z">${esc(it.zh)}</div><div style="color:var(--red)">${esc(it.py)}</div><div>${esc(it.en)}</div></div>${spkBtn(it.zh)}</div>`;
+    h+=`<div class="fb ${fb}"><h4>${ok?"對！ Correct":"Not quite…"}</h4>${body}
+    ${!ok&&q.mode==="en"?`<button class="ghost" id="override" style="margin:0 0 10px">I was right (count it)</button>`:""}<button class="primary" id="next">Continue</button></div>`}
+  h+=`</div>`;$("#quiz").innerHTML=h;
+  if(fb){if(it)speak(it.zh);else if(q.mode==="person")speak(q.ans);const n=$("#next");n&&n.focus()}
+  else{if(q.mode==="listen")speak(it.zh);const inp=$("#enin")||$("#nin");inp&&inp.focus()}
+}
+function bookClick(t,q){
+  if(q.mode==="match"){
+    if(t.dataset.ml!==undefined){q.sel=+t.dataset.ml;q.flash=-1;drawQ();return true}
+    if(t.dataset.mr!==undefined){const r=+t.dataset.mr;if(q.sel<0)return true;
+      if(r===q.sel){q.done.push(r);if(q.pairs[r].it&&!q.miss.includes(r))record(q.pairs[r].it,true);q.sel=-1;q.flash=-1}
+      else{if(!q.miss.includes(q.sel)){q.miss.push(q.sel);if(q.pairs[q.sel].it)record(q.pairs[q.sel].it,false);save()}q.flash=r}
+      if(q.done.length===q.pairs.length){answer(q.miss.length===0,"")}else drawQ();return true}}
+  if(t.dataset.bopt!==undefined){const o=q.opts[+t.dataset.bopt];q.chosen=o;answer(o===q.ans,o);return true}
+  if(t.dataset.tf!==undefined){const v=t.dataset.tf==="true";q.chosen=v;answer(v===q.ans,v?"true":"false");return true}
+  if(t.dataset.ctog!==undefined){const k=+t.dataset.ctog;q.sel=q.sel.includes(k)?q.sel.filter(x=>x!==k):q.sel.concat([k]);drawQ();return true}
+  if(t.id==="checkc"){const s=q.sel.map(k=>q.opts[k]).sort().join(""),g=q.good.slice().sort().join("");answer(s===g,q.sel.map(k=>q.opts[k]).join(" "));return true}
+  if(t.id==="replay"){speak(q.it.zh);return true}
+  if(t.id==="checken"||t.id==="skipen"){const g=t.id==="skipen"?"":$("#enin").value;q.given=g;answer(t.id==="checken"&&enOK(g,q.it.en),g||"—");return true}
+  if(t.id==="checkn"||t.id==="skipn"){const g=t.id==="skipn"?"":$("#nin").value.trim();q.given=g;
+    const ok=t.id==="checkn"&&(q.dir==="zh2d"?parseInt(g,10)===q.n:norm(g)===norm(q.it.zh));answer(ok,g||"—");return true}
+  return false}
 let Q=null;
 function start(kind,lid){
-  const exam=kind==="exam";const qs=buildSession(kind,lid,exam?20:kind==="errors"?Math.min(15,errCount()):10);
+  const exam=kind==="exam";const isBook=kind.startsWith("bk:");const qs=isBook?buildBook(kind.slice(3),lid):buildSession(kind,lid,exam?20:kind==="errors"?Math.min(15,errCount()):10);
+  qs.forEach(q=>{if(q.mode==="match"){q.lo=shuffle(q.pairs.map((_,i)=>i));q.ro=shuffle(q.pairs.map((_,i)=>i));q.sel=-1;q.done=[];q.miss=[];q.norec=true;q.flash=-1}});
   if(!qs.length)return;
   const L=lid&&lid!=="all"?lesson(lid):null;
-  Q={kind,lid,exam,qs,i:0,res:[],requeued:new Set(),title:exam?(L?(L.id==="v"?"Test · Veronica":`Test · Lesson ${L.code}`):"Full test"):kind==="errors"?"Mistake review":(L?(L.id==="v"?"Veronica":`Lesson ${L.code}`):"")};
+  Q={kind,lid,exam,qs,i:0,res:[],requeued:new Set(),title:isBook?((lid==="v"?"Veronica":"Lesson "+lesson(lid).code)+" · Workbook"):exam?(L?(L.id==="v"?"Test · Veronica":`Test · Lesson ${L.code}`):"Full test"):kind==="errors"?"Mistake review":(L?(L.id==="v"?"Veronica":`Lesson ${L.code}`):"")};
   $("#quiz").classList.remove("hide");document.body.style.overflow="hidden";drawQ()}
 function closeQ(){Q=null;$("#quiz").classList.add("hide");$("#quiz").innerHTML="";document.body.style.overflow="";render()}
 function drawQ(fb){
+  if(Q.qs[Q.i].book)return drawBook(Q.qs[Q.i],fb);
   const q=Q.qs[Q.i],it=q.it,showPy=S.pinyin&&!Q.exam;
   const pct=Math.round(100*Q.i/Q.qs.length);
   let h=`<div class="qin"><div class="qtop"><button class="x" data-quit aria-label="Quit">×</button><div class="bar"><i style="width:${pct}%"></i></div><span class="note">${Q.i+1}/${Q.qs.length}</span></div>
@@ -727,22 +951,22 @@ function drawQ(fb){
   else if(q.mode==="write"){const w=$("#wr");w&&w.focus()}
 }
 function answer(ok,given){
-  const q=Q.qs[Q.i];record(q.it,ok);Q.res.push({q,ok,given});save();
+  const q=Q.qs[Q.i];if(q.it&&!q.norec)record(q.it,ok);Q.res.push({q,ok,given});save();
   if(Q.exam){nextQ();return}
-  if(!ok&&!Q.requeued.has(q.it.id)){Q.requeued.add(q.it.id);const m=q.mode;Q.qs.push(makeQ(q.it,m,Q.lid&&Q.lid!=="all"?BYL[Q.lid]:ALL))}
+  if(!ok&&!q.book&&!Q.requeued.has(q.it.id)){Q.requeued.add(q.it.id);const m=q.mode;Q.qs.push(makeQ(q.it,m,Q.lid&&Q.lid!=="all"?BYL[Q.lid]:ALL))}
   drawQ(ok?"good":"bad")}
 function nextQ(){Q.i++;if(Q.i>=Q.qs.length)finish();else drawQ()}
 function finish(){
-  const first=new Map();for(const r of Q.res)if(!first.has(r.q.it.id+r.q.mode))first.set(r.q.it.id+r.q.mode,r);
+  const first=new Map();for(const r of Q.res){const key=r.q.uid?"u"+r.q.uid:r.q.it.id+r.q.mode;if(!first.has(key))first.set(key,r)}
   const res=[...first.values()];const s=res.filter(r=>r.ok).length,n=res.length;
   if(Q.exam){S.tests.push({l:Q.lid||"all",s,n,d:Date.now()});if(S.tests.length>200)S.tests=S.tests.slice(-200);save()}
   const pct=Math.round(100*s/n);const seal=pct>=90?"優":pct>=70?"好":pct>=50?"可":"加油";
-  const wrong=res.filter(r=>!r.ok);
+  const wrong=[];for(const r of res.filter(r=>!r.ok)){if(r.q.mode==="match")r.q.miss.forEach(i=>{const pr=r.q.pairs[i];wrong.push({q:{it:pr.it||{zh:pr.l,py:"",en:pr.r}},ok:false,given:""})});else if(r.q.it)wrong.push(r);else if(r.q.mode==="tf")wrong.push({q:{it:{zh:r.q.st,py:r.q.py,en:r.q.en+" → "+(r.q.ans?"true":"false")}},ok:false,given:r.given});else if(r.q.mode==="person")wrong.push({q:{it:{zh:r.q.ans,py:"",en:r.q.who.en+": "+r.q.qz}},ok:false,given:r.given});else if(r.q.mode==="combo")wrong.push({q:{it:{zh:r.q.good.map(c=>r.q.pos==="after"?r.q.x+c:c+r.q.x).join(" · "),py:"",en:"Words with "+r.q.x}},ok:false,given:r.given})}
   let h=`<div class="qin"><div class="qtop"><button class="x" data-quit aria-label="Close">×</button><div class="bar"><i style="width:100%"></i></div></div>
   <div class="score"><div class="zh">${seal}</div><b>${s} / ${n}</b><span class="note">${pct}% correct${seal==="加油"?" · 加油 jiāyóu = keep going!":""}</span></div>`;
   if(wrong.length){h+=`<h2>${Q.exam?"Corrections":"To review"} (${wrong.length})</h2>`+wrong.map(r=>{const it=r.q.it;
     return `<div class="row"><div class="w"><div class="z">${esc(it.zh)}</div><div class="p">${esc(it.py)}</div><div class="e">${esc(it.en)}</div>${r.given?`<div class="note" style="color:var(--red)">Your answer: ${esc(r.given)}</div>`:""}</div>${spkBtn(it.zh)}</div>`}).join("")+
-    `<p class="note">These items were added to “My mistakes”.</p>`}
+    `<p class="note">Words and sentences you missed were added to “My mistakes”.</p>`}
   else h+=`<p class="empty">Perfect score, well done!</p>`;
   h+=`<button class="primary" id="again">Try again</button><button class="ghost" data-quit>Finish</button></div>`;
   $("#quiz").innerHTML=h;Q.done=true;
@@ -772,6 +996,8 @@ document.addEventListener("click",e=>{
   if(t.id==="again"){const k=Q.exam?"exam":Q.kind,l=Q.lid;closeQ();start(k,l);return}
   if(t.id==="next"){nextQ();return}
   const q=Q.qs[Q.i];if(!q||Q.done)return;
+  if(q.book&&bookClick(t,q))return;
+  if(t.id==="override"){const r=Q.res[Q.res.length-1];if(r&&!r.ok){r.ok=true;const e=S.err[q.it.id];if(e){e.n--;if(e.n<=0)delete S.err[q.it.id]}S.known[q.it.id]=1;save()}nextQ();return}
   if(t.dataset.opt!==undefined){const o=q.opts[+t.dataset.opt];q.chosen=o;answer(o===q.ans,o);return}
   if(t.dataset.pick!==undefined){const k=+t.dataset.pick;if(!q.picked.includes(k)){q.picked.push(k);drawQ()}return}
   if(t.dataset.unpick!==undefined){q.picked.splice(+t.dataset.unpick,1);drawQ();return}
@@ -788,7 +1014,7 @@ document.addEventListener("submit",async e=>{if(e.target.id!=="vform")return;e.p
   render();const f=$("#vzh");f&&f.focus()});
 $("#sheet").addEventListener("click",e=>{if(e.target.id==="sheet")$("#sheet").classList.add("hide")});
 document.addEventListener("input",e=>{if(e.target.id in VD){VD[e.target.id]=e.target.value;return}if(e.target.id==="q"){query=e.target.value.trim();const pos=e.target.selectionStart;render();const q=$("#q");if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(_){}}}});
-document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="wr"){e.preventDefault();const b=$("#checkw");b&&b.click();return}if(e.key==="Escape"){if(!$("#sheet").classList.contains("hide"))$("#sheet").classList.add("hide");else if(Q)closeQ()}});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&["wr","enin","nin"].includes(e.target.id)){e.preventDefault();const b=$("#checkw")||$("#checken")||$("#checkn");b&&b.click();return}if(e.key==="Escape"){if(!$("#sheet").classList.contains("hide"))$("#sheet").classList.add("hide");else if(Q)closeQ()}});
 window.addEventListener("hashchange",route);
 vLoad();
 route();
